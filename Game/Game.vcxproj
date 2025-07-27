@@ -164,6 +164,7 @@
   <ItemGroup>
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\InputManager.h" />
+    <ClInclude Include="src\PlayerComponent.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\Scene.h" />
     <ClInclude Include="src\Window.h" />

@@ -10,7 +10,7 @@
 Game::Game() :
 	m_window(std::make_unique<Window>()),
 	m_renderer(std::make_unique<Renderer>()),
-	m_inputManager(std::make_unique<InputManager>()),
+	m_inputManager(std::make_shared<InputManager>()),
     m_scene(std::make_unique<Scene>()),
 	m_isRunning(false),
 	m_lastFrameTime(0)
@@ -39,7 +39,7 @@ bool Game::Initialize(const std::string& title, int width, int height)
 		return false;
 	}
 
-	m_scene->Initialize();
+	m_scene->Initialize(m_inputManager);
 
 	m_isRunning = true;
 	m_lastFrameTime = SDL_GetPerformanceCounter();

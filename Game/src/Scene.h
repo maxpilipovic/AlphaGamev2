@@ -1,13 +1,16 @@
 #pragma once
 #include "Astra/Astra.hpp"
 #include "Renderer.h"
+#include "PlayerComponent.h"
+
+class InputManager;
 
 class Scene
 {
 public:
 	Scene() = default;
 
-	void Initialize();
+	void Initialize(std::shared_ptr<InputManager>);
 	void Shutdown();
 	void Update(float deltatime);
 	void Render(Renderer* renderer);
@@ -40,4 +43,5 @@ private:
 	Astra::Registry m_registry;
 	bool m_active = false;
 	std::vector<Astra::Entity> m_entities;
+    std::shared_ptr<InputManager> m_inputManager;
 };

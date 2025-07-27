@@ -1,9 +1,14 @@
 #include "Scene.h"
 #include <algorithm>
+#include "InputManager.h"
+#include <SDL3/SDL.h>
 
-void Scene::Initialize()
+void Scene::Initialize(std::shared_ptr<InputManager> inputManager)
 {   
 	//This is where you can set up your scene, load resources, etc.
+    Astra::Entity player = CreateEntity();
+    m_registry.AddComponent<PlayerComponent>(player, 100.0f, 100.0f, 200.0f, 150.0f, 0.0001f);
+    m_inputManager = inputManager;
 }
 
 void Scene::Shutdown()
@@ -15,6 +20,16 @@ void Scene::Shutdown()
 void Scene::Update(float deltatime)
 {
 	//This is where you would update your game logic, like physics, AI, etc.
+    
+    //Grab all players in registry(world)
+    auto view = m_registry.GetView<PlayerComponent>();
+
+    for (auto& [entity, player] : view)
+    {
+        player.x = m_inputManager->getX();
+        player.y = m_inputManager->getY();
+    }
+
     UpdatePhysics(deltatime);
 }
 
@@ -23,14 +38,27 @@ void Scene::Render(Renderer* renderer)
 	//This is where you would render all the entities in the scene.
     //For example, you could iterate over all entities with a TransformComponent and a SpriteComponent
     //and then render them.
-    SDL_FRect rect;
-    rect.x = 100.0f;
-    rect.y = 100.0f;
-    rect.w = 200.0f;
-    rect.h = 150.0f;
 
-    renderer->SetDrawColor(255, 0, 0, 255); //Red
-    renderer->FillRect(&rect);
+    auto view = m_registry.GetView<PlayerComponent>();
+
+    for (auto [entity, player] : view)
+    {   
+
+        SDL_Surface* surface = IMG_Load(file);
+
+
+
+        SDL_FRect rect;
+        
+        rect.x = player.x;
+        rect.y = player.y;
+        rect.w = player.width;
+        rect.h = player.height;
+
+        renderer->SetDrawColor(255, 0, 0, 255); //Red
+        renderer->FillRect(&rect);
+
+    }
 }
 
 Astra::Entity Scene::CreateEntity()
