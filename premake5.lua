@@ -26,6 +26,7 @@ archmap["ARM64"] = "arm64"
 -- Include directories relative to root folder (solution directory)
 IncludeDir = {}
 IncludeDir["SDL3"] = "vendor/sdl3/include"
+IncludeDir["SDL_image"] = "vendor/SDL_image/include"
 IncludeDir["Astra"] = "vendor/Astra/include"
 
 project "Game"
@@ -60,17 +61,20 @@ project "Game"
     {
         "%{prj.name}/src",
         "%{IncludeDir.SDL3}",
+        "%{IncludeDir.SDL_image}",
         "%{IncludeDir.Astra}"
     }
     
     libdirs
     {
-        "vendor/sdl3/lib/%{archmap[cfg.architecture] or cfg.architecture}"
+        "vendor/sdl3/lib/%{archmap[cfg.architecture] or cfg.architecture}",
+        "vendor/SDL_image/lib/%{archmap[cfg.architecture] or cfg.architecture}"
     }
     
     links
     {
         "SDL3"
+        --"SDL3_image"
     }
 
     filter "system:windows"

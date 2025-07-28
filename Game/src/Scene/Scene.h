@@ -1,7 +1,7 @@
 #pragma once
 #include "Astra/Astra.hpp"
-#include "Renderer.h"
-#include "PlayerComponent.h"
+#include "../Renderer/Renderer.h"
+#include "Components.h"
 
 class InputManager;
 
@@ -44,4 +44,6 @@ private:
 	bool m_active = false;
 	std::vector<Astra::Entity> m_entities;
     std::shared_ptr<InputManager> m_inputManager;
+    bool m_placingEntity = false; //Flag for checking if placing or not
+    Astra::Entity m_currentPlacingEntity; //Entity state for placing
 };

@@ -11,7 +11,6 @@ void InputManager::ProcessEvent(const SDL_Event& event)
     
     if (event.type == SDL_EVENT_MOUSE_MOTION)
     {
-
         SDL_GetMouseState(&m_mouseX, &m_mouseY);
     }
     if (event.type == SDL_EVENT_KEY_DOWN)

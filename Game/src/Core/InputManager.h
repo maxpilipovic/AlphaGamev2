@@ -18,6 +18,6 @@ public:
 private:
     std::unordered_map<SDL_Keycode, bool> m_lastFrameKeys;
     std::unordered_map<SDL_Keycode, bool> m_currentKeys;
-    float m_mouseX;
-    float m_mouseY;
+    float m_mouseX = 0.0f;
+    float m_mouseY = 0.0f;
 };

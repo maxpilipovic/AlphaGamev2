@@ -1,9 +1,9 @@
 #include "Game.h";
 #include <iostream>
-#include "Window.h"
-#include "Renderer.h"
-#include "InputManager.h"
-#include "Scene.h"
+#include "Core/Window.h"
+#include "Renderer/Renderer.h"
+#include "Core/InputManager.h"
+#include "Scene/Scene.h"
 
 //Constructor
 
@@ -40,6 +40,14 @@ bool Game::Initialize(const std::string& title, int width, int height)
 	}
 
 	m_scene->Initialize(m_inputManager);
+
+	
+	/*Astra::Entity player = m_scene->CreateEntity();
+	m_scene->AddComponent<PlayerComponent>(player);
+	auto* sprite = m_scene->AddComponent<SpriteRendererComponent>(player);
+	sprite->red = 255;
+	sprite->sprite.h = 100.0f;
+	sprite->sprite.w = 100.0f;*/
 
 	m_isRunning = true;
 	m_lastFrameTime = SDL_GetPerformanceCounter();
@@ -93,11 +101,11 @@ void Game::Update(float deltaTime)
 void Game::Render()
 {
 	m_renderer->SetDrawColor(18, 18, 18, 255);
-	m_renderer->Clear();
+	m_renderer->Clear(); //What is this?
 
-    m_scene->Render(m_renderer.get());
+    m_scene->Render(m_renderer.get()); //What are we doing here? //Rendering everything to scene?
 
-	m_renderer->Present();
+	m_renderer->Present(); //What is this?
 }
 
 

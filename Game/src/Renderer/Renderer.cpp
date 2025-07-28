@@ -1,5 +1,5 @@
 #include "Renderer.h"
-#include "Window.h"
+#include "../Core/Window.h"
 #include <iostream>
 
 Renderer::Renderer() : m_renderer(nullptr) {}
