@@ -163,6 +163,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\InputManager.h" />
+    <ClInclude Include="src\Core\Math.h" />
     <ClInclude Include="src\Core\Window.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />

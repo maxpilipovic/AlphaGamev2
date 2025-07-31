@@ -11,11 +11,46 @@ struct SpriteRendererComponent {
 	uint8_t red;
 	uint8_t green;
 	uint8_t blue;
-	uint8_t alpha;
+	uint8_t alpha = 255;
 };
 
-struct PlayerComponent
+struct Robot {
+
+};
+
+struct RedRobot
 {
 
 };
+
+struct BlueRobot
+{
+
+};
+
+struct GreenRobot
+{
+
+};
+
+struct YellowRobot
+{
+
+};
+
+struct CircleCollider
+{
+	float x;
+	float y;
+	float radius;
+};
+
+struct RobotRange
+{
+	float x;
+	float y;
+	float radius;
+};
+
+
 

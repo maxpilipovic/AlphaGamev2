@@ -5,6 +5,13 @@
 
 class InputManager;
 
+enum class RobotType {
+    Red,
+    Green,
+    Blue,
+    Yellow
+};
+
 class Scene
 {
 public:
@@ -16,6 +23,11 @@ public:
 	void Render(Renderer* renderer);
 	Astra::Entity CreateEntity();
 	void DestroyEntity(Astra::Entity);
+
+    void CreateRobot(RobotType robot);
+    void UpdatePlacingRobot();
+    void FinalizePlacingRobot();
+    bool IsPlacingRobotColliding();
 	//Astra::Entity FindEntity(const std::string& name) const;
 
     template<typename T, typename... Args>

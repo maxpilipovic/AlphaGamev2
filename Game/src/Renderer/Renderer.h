@@ -21,11 +21,14 @@ public:
     void DrawRect(const SDL_FRect* rect);
     void FillRect(const SDL_FRect* rect);
     void DrawLine(float x1, float y1, float x2, float y2);
+    void DrawCircle(int centerX, int centerY, int radius);
 
     SDL_Texture* LoadTexture(const char* path);
     void RenderCopy(SDL_Texture* texture, const SDL_Rect* srcRect, const SDL_FRect* destRect);
 
     SDL_Renderer* GetSDLRenderer() const { return m_renderer; }
+
+
 
 private:
     SDL_Renderer* m_renderer;

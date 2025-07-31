@@ -90,3 +90,32 @@ void Renderer::DrawLine(float x1, float y1, float x2, float y2)
 	}
 }
 
+void Renderer::DrawCircle(int centerX, int centerY, int radius)
+{
+	int x = radius;
+	int y = 0;
+	int decisionOver2 = 1 - x;   // Decision criterion divided by 2 evaluated at x=r, y=0
+
+	while (y <= x) {
+		// Draw each octant
+		SDL_RenderPoint(m_renderer, centerX + x, centerY + y);
+		SDL_RenderPoint(m_renderer, centerX + y, centerY + x);
+		SDL_RenderPoint(m_renderer, centerX - x, centerY + y);
+		SDL_RenderPoint(m_renderer, centerX - y, centerY + x);
+		SDL_RenderPoint(m_renderer, centerX - x, centerY - y);
+		SDL_RenderPoint(m_renderer, centerX - y, centerY - x);
+		SDL_RenderPoint(m_renderer, centerX + x, centerY - y);
+		SDL_RenderPoint(m_renderer, centerX + y, centerY - x);
+		y++;
+		if (decisionOver2 <= 0) {
+			decisionOver2 += 2 * y + 1;
+		}
+		else {
+			x--;
+			decisionOver2 += 2 * (y - x) + 1;
+		}
+	}
+}
+
+
+

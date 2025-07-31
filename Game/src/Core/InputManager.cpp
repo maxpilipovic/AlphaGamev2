@@ -23,6 +23,11 @@ void InputManager::ProcessEvent(const SDL_Event& event)
     }
 }
 
+bool InputManager::IsButtonPressed(int x) const
+{
+    return (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_MASK(x));
+}
+
 bool InputManager::IsKeyDown(SDL_Keycode key) const
 {
     auto it = m_currentKeys.find(key);

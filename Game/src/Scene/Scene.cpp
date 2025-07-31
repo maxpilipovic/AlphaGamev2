@@ -2,6 +2,7 @@
 #include <algorithm>
 #include "../Core/InputManager.h"
 #include <SDL3/SDL.h>
+#include <core/Math.h>
 
 void Scene::Initialize(std::shared_ptr<InputManager> inputManager)
 {
@@ -22,70 +23,39 @@ void Scene::Update(float deltatime)
 {
 
     //This is where you would update your game logic, like physics, AI, etc.
-    bool check1 = m_inputManager->IsKeyPressed(SDLK_1);
+    bool checkKey1 = m_inputManager->IsKeyPressed(SDLK_1);
+    bool checkKey2 = m_inputManager->IsKeyPressed(SDLK_2);
+    bool checkKey3 = m_inputManager->IsKeyPressed(SDLK_3);
+    bool checkKey4 = m_inputManager->IsKeyPressed(SDLK_4);
 
-    if (check1 and !m_placingEntity)
-    {
-        m_currentPlacingEntity = CreateEntity();
-        auto transform = GetComponent<Transform>(m_currentPlacingEntity); //Getting pointer from GetComponent
-        auto sprite = AddComponent<SpriteRendererComponent>(m_currentPlacingEntity); //Getting pointer from GetComponent
-        
-        //Grabs our coords
-        transform->x = m_inputManager->getX();
-        transform->y = m_inputManager->getY();
-
-        //Set w & h
-        transform->width = 50.0f;
-        transform->height = 50.0f;
-
-        //Initalize and create color BLUE
-        sprite->sprite = { transform->x, transform->y, transform->width, transform->height };
-        sprite->red = 0;
-        sprite->green = 0;
-        sprite->blue = 255;
-        sprite->alpha = 255;
-        /*SDL_FRect rect;
-        rect.x = transform->x;
-        rect.y = transform->y;
-        rect.w = transform->width;
-        rect.h = transform->height;
-
-        sprite->sprite = rect;*/
-
-        m_placingEntity = true;
+    if (!m_placingEntity) {
+        if (checkKey1)
+        {
+            CreateRobot(RobotType::Blue);
+        }
+        if (checkKey2)
+        {
+            CreateRobot(RobotType::Red);
+        }
+        if (checkKey3)
+        {
+            CreateRobot(RobotType::Green);
+        }
+        if (checkKey4)
+        {
+            CreateRobot(RobotType::Yellow);
+        }
     }
-
-    //Keep moving
-    if (m_placingEntity)
-    {
-        auto transform = GetComponent<Transform>(m_currentPlacingEntity);
-        auto sprite = GetComponent<SpriteRendererComponent>(m_currentPlacingEntity);
-
-        //Follow mouse position
-        transform->x = m_inputManager->getX();
-        transform->y = m_inputManager->getY();
-
-        //Update sprite rect as well
-        sprite->sprite.x = transform->x;
-        sprite->sprite.y = transform->y;
-    }
-
     
 
-    if (m_placingEntity && (SDL_GetMouseState(nullptr, nullptr) & SDL_BUTTON_MASK(SDL_BUTTON_LEFT)))
+    //Keep moving
+    UpdatePlacingRobot();
+
+   //Place it
+    if (!IsPlacingRobotColliding())
     {
-        auto transform = GetComponent<Transform>(m_currentPlacingEntity);
-        auto sprite = GetComponent<SpriteRendererComponent>(m_currentPlacingEntity);
-
-        transform->x = m_inputManager->getX();
-        transform->y = m_inputManager->getY();
-        sprite->sprite.x = transform->x;
-        sprite->sprite.y = transform->y;
-
-        m_placingEntity = false;
-        check1 = false;
+        FinalizePlacingRobot();
     }
-
 
     //Grab all players in registry(world)
     /*auto view = m_registry.GetView<Transform, PlayerComponent>();
@@ -99,16 +69,160 @@ void Scene::Update(float deltatime)
     UpdatePhysics(deltatime);
 }
 
+bool Scene::IsPlacingRobotColliding()
+{
+    auto placingCircle = GetComponent<CircleCollider>(m_currentPlacingEntity);
+    auto view = m_registry.GetView<Robot, CircleCollider>();
+
+    for (const auto& [entity, _, circle] : view)
+    {
+        if (m_currentPlacingEntity == entity)
+        {
+            continue;
+        }
+
+        if (Math::IsCircleColliding(placingCircle->x, placingCircle->y, placingCircle->radius, circle.x, circle.y, circle.radius))
+        {
+            return true;
+        }
+        
+    }
+    return false;
+}
+
+void Scene::FinalizePlacingRobot()
+{
+    if (!m_placingEntity || !m_inputManager->IsButtonPressed(SDL_BUTTON_LEFT))
+        return;
+
+    auto transform = GetComponent<Transform>(m_currentPlacingEntity);
+    auto sprite = GetComponent<SpriteRendererComponent>(m_currentPlacingEntity);
+    auto range = GetComponent<RobotRange>(m_currentPlacingEntity);
+
+    if (!transform || !sprite)
+        return;
+
+    //Final position based on mouse
+    transform->x = m_inputManager->getX();
+    transform->y = m_inputManager->getY();
+    sprite->sprite.x = transform->x;
+    sprite->sprite.y = transform->y;
+
+    float centerX = transform->x + (sprite->sprite.w * 0.5);
+    float centerY = transform->y + (sprite->sprite.h * 0.5);
+
+    range->x = centerX;
+    range->y = centerY;
+
+    m_placingEntity = false;
+}
+
+void Scene::UpdatePlacingRobot()
+{
+    if (!m_placingEntity) return;
+
+    auto transform = GetComponent<Transform>(m_currentPlacingEntity);
+    auto circle = GetComponent<CircleCollider>(m_currentPlacingEntity);
+    auto sprite = GetComponent<SpriteRendererComponent>(m_currentPlacingEntity);
+
+    if (!transform || !circle) return;
+
+    //Follow mouse position
+    transform->x = m_inputManager->getX();
+    transform->y = m_inputManager->getY();
+
+    //Update sprite rect
+    float centerX = transform->x + (sprite->sprite.w * 0.5);
+    float centerY = transform->y + (sprite->sprite.h * 0.5);
+
+    circle->x = centerX;
+    circle->y = centerY;
+}
+
+void Scene::CreateRobot(RobotType robot)
+{
+    m_currentPlacingEntity = CreateEntity();
+
+    auto transform = GetComponent<Transform>(m_currentPlacingEntity);
+    auto sprite = AddComponent<SpriteRendererComponent>(m_currentPlacingEntity);
+    auto circle = AddComponent<CircleCollider>(m_currentPlacingEntity);
+    auto range = AddComponent<RobotRange>(m_currentPlacingEntity);
+
+    //Add to seperate other colliders...
+    AddComponent<Robot>(m_currentPlacingEntity);
+
+    circle->radius = 40.0f;
+
+    if (!transform || !sprite) return;
+
+    //Set initial position
+    transform->x = m_inputManager->getX();
+    transform->y = m_inputManager->getY();
+    transform->width = 50.0f;
+    transform->height = 50.0f;
+
+    //Assign initial sprite rect
+    sprite->sprite = { transform->x, transform->y, transform->width, transform->height };
+
+    //Assign color based on key
+
+    switch (robot)
+    {
+    case RobotType::Blue:
+    {
+        AddComponent<BlueRobot>(m_currentPlacingEntity);
+        //Why do this?
+        sprite->red = 0;
+        sprite->green = 0;
+        sprite->blue = 255;
+        range->radius = 100;
+        break;
+    }
+    case RobotType::Red:
+    {
+        AddComponent<RedRobot>(m_currentPlacingEntity);
+        sprite->red = 255;
+        sprite->green = 0;
+        sprite->blue = 0;
+        range->radius = 125;
+        break;
+    }
+    case RobotType::Green:
+    {
+        AddComponent<GreenRobot>(m_currentPlacingEntity);
+        sprite->red = 0;
+        sprite->green = 255;
+        sprite->blue = 0;
+        range->radius = 175;
+        break;
+    }
+    case RobotType::Yellow:
+    {
+        AddComponent<YellowRobot>(m_currentPlacingEntity);
+        sprite->red = 255;
+        sprite->green = 255;
+        sprite->blue = 0;
+        range->radius = 250;
+        break;
+    }
+    default:
+        break;
+    }
+
+    //sprite->alpha = 255;
+
+    m_placingEntity = true;
+}
+
 void Scene::Render(Renderer* renderer)
 {
 	//This is where you would render all the entities in the scene.
     //For example, you could iterate over all entities with a TransformComponent and a SpriteComponent
     //and then render them.
 
-    auto view = m_registry.GetView<Transform, SpriteRendererComponent>();
+    auto view = m_registry.GetView<Transform, SpriteRendererComponent, RobotRange, CircleCollider>();
 
-
-    for (const auto& [entity, transform, sprite] : view)
+    for (const auto& [entity, transform, sprite, range, circle] : view) //Structured binding
     {
         //Ask ethana about this?
         sprite.sprite.x = transform.x;
@@ -116,15 +230,12 @@ void Scene::Render(Renderer* renderer)
         renderer->SetDrawColor(sprite.red, sprite.green, sprite.blue, sprite.alpha);
         renderer->FillRect(&sprite.sprite);
 
-        //renderer->DrawSprite(&player.sprite);w
-        //SDL_FRect rect;
-        //rect.x = transform.x;
-        //rect.y = transform.y;
-        //rect.w = 100.0;
-        //rect.h = 100.0;
+        renderer->SetDrawColor(0, 0, 0, 255); //Black
+        renderer->DrawCircle(circle.x, circle.y, circle.radius);
 
-        //renderer->SetDrawColor(255, 0, 0, 255);
-        //renderer->FillRect(&rect);
+        renderer->DrawCircle(range.x, range.y, range.radius);
+        
+
 
     }
 }

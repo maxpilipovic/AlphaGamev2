@@ -12,6 +12,7 @@ public:
     bool IsKeyDown(SDL_Keycode key) const;
     bool IsKeyPressed(SDL_Keycode key) const;
     bool IsKeyReleased(SDL_Keycode key) const;
+    bool IsButtonPressed(int x) const;
     float getX() const { return m_mouseX; }
     float getY() const { return m_mouseY; }
 
