@@ -14,8 +14,40 @@ struct SpriteRendererComponent {
 	uint8_t alpha = 255;
 };
 
-struct Robot {
+struct Projectile {
+	//velocity
+	//direction
+	//lifetime (live forever in registry)
+	float velocity;
+	float directionAngle;
+	float lifetime;
+	float age = 0.0f; //Time since spawned!
+};
 
+struct Tank {
+	float health = 5.0f;
+};
+
+struct OrangeTank {
+
+};
+
+struct RedTank {
+
+};
+
+struct TealTank {
+
+};
+
+struct VioletTank {
+
+};
+
+struct Robot {
+	Astra::Entity target; //This will be used for the robots to lock onto a tank
+	float fireRate = 1.0f; //Shots per second
+	float fireCooldown = 0.0f; //Time until next shot
 };
 
 struct RedRobot

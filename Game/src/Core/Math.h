@@ -15,8 +15,8 @@ namespace Math
 	{
 		//Distance function
 		float distance = Distance(x1, y1, x2, y2);
-		
-		return distance <= r1 + r2;
 
+		return distance <= r1 + r2;
 	}
+
 }

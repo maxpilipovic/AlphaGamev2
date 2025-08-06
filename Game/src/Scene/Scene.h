@@ -12,6 +12,13 @@ enum class RobotType {
     Yellow
 };
 
+enum class TankType {
+    Teal,
+    Orange,
+    Violet,
+    Red
+};
+
 class Scene
 {
 public:
@@ -24,10 +31,18 @@ public:
 	Astra::Entity CreateEntity();
 	void DestroyEntity(Astra::Entity);
 
+    //Creation
     void CreateRobot(RobotType robot);
-    void UpdatePlacingRobot();
-    void FinalizePlacingRobot();
-    bool IsPlacingRobotColliding();
+    void CreateTank(TankType tank);
+    void CreateProjectile(Astra::Entity& robot, Astra::Entity& tank);
+
+    //Updating
+    void UpdatePlacingEntity();
+    void FinalizePlacingEntity();
+    bool IsPlacingEntityColliding();
+	void UpdateProjectiles(float deltatime);
+    void RobotInteraction(float deltatime);
+
 	//Astra::Entity FindEntity(const std::string& name) const;
 
     template<typename T, typename... Args>
