@@ -24,6 +24,11 @@ struct Projectile {
 	float age = 0.0f; //Time since spawned!
 };
 
+struct PathFollower {
+	int currentWayPoint = 0;
+	float speed = 100.0f;
+};
+
 struct Tank {
 	float health = 5.0f;
 };

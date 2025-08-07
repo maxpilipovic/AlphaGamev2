@@ -67,6 +67,18 @@ void Scene::Update(float deltatime)
         }
     }
     
+    //Update MOVEMENT - spawned tanks
+    m_tankSpawnTimer += deltatime;
+    
+    if (m_tankSpawnTimer >= m_tankSpawnInterval)
+    {
+        SpawnEnemyTank();
+        m_tankSpawnTimer = 0.0f;
+    }
+
+    
+    //Update tank movement
+    UpdateTankPathing(deltatime);
 
     //Keep moving
     UpdatePlacingEntity();
@@ -77,6 +89,7 @@ void Scene::Update(float deltatime)
         FinalizePlacingEntity();
     }
 
+    //Update all tanks and robots in registry
 	auto robots = m_registry.GetView<Transform, Robot, RobotRange>();
 	auto tanks = m_registry.GetView<Transform, Tank>();
 
@@ -85,19 +98,102 @@ void Scene::Update(float deltatime)
         RobotInteraction(deltatime);
 	}
 
+    //Update projectiles
 	UpdateProjectiles(deltatime);
 
-    //Grab all players in registry(world)
-    /*auto view = m_registry.GetView<Transform, PlayerComponent>();
-
-    for (const auto& [entity, transform, player] : view)
-    {
-        transform.x = m_inputManager->getX();
-        transform.y = m_inputManager->getY();
-    }*/
-
+    //Update physics (idk if I have any for this project)
     UpdatePhysics(deltatime);
 }
+
+void Scene::UpdateTankPathing(float deltatime)
+{
+    auto tanks = m_registry.GetView<Transform, Tank, PathFollower>();
+
+    for (const auto& [entity, transform, tank, follower] : tanks)
+    {
+
+        //End of path
+        if (follower.currentWayPoint >= enemyPathL1.size())
+        {
+            DestroyEntity(entity);
+            continue;
+        }
+
+        //Get the current target and calculate the distance 
+        SDL_FPoint target = enemyPathL1[follower.currentWayPoint];
+        float dx = target.x - transform.x;
+        float dy = target.y - transform.y;
+        float distance = std::sqrt(dx * dx + dy * dy);
+
+        //Less then a pixel just move it anyway.
+        if (distance < 1.0f)
+        {
+            follower.currentWayPoint++;
+            
+        }
+
+
+        //Normalize direction? Was confused about this
+        float normX = dx / distance;
+        float normY = dy / distance;
+
+        //Moves the tank
+        transform.x += normX * follower.speed * deltatime;
+        transform.y += normY * follower.speed * deltatime;
+
+        //Moves the sprite
+        auto sprite = GetComponent<SpriteRendererComponent>(entity);
+        if (sprite) {
+            sprite->sprite.x = transform.x;
+            sprite->sprite.y = transform.y;
+        }
+
+        //Moves the circle collider
+        auto circle = GetComponent<CircleCollider>(entity);
+        if (circle) {
+            float centerX = transform.x + (sprite ? sprite->sprite.w * 0.5f : 0.0f);
+            float centerY = transform.y + (sprite ? sprite->sprite.h * 0.5f : 0.0f);
+            circle->x = centerX;
+            circle->y = centerY;
+        }
+
+
+
+
+
+    }
+}
+
+void Scene::SpawnEnemyTank()
+{
+    Astra::Entity spawnedTank = CreateEntity();
+    auto transform = GetComponent<Transform>(spawnedTank);
+    auto tank = AddComponent<Tank>(spawnedTank);
+    auto orangeTank = AddComponent<OrangeTank>(spawnedTank);
+    auto pathfinder = AddComponent<PathFollower>(spawnedTank);
+    auto sprite = AddComponent<SpriteRendererComponent>(spawnedTank);
+    auto circle = AddComponent<CircleCollider>(spawnedTank);
+
+    transform->x = enemyPathL1[0].x;
+    transform->y = enemyPathL1[0].y;
+
+    circle->radius = 40.0f;
+
+    //Orange tank
+    sprite->red = 255;
+    sprite->green = 165;
+    sprite->blue = 0;
+
+    //Set initial position
+    transform->width = 50.0f;
+    transform->height = 50.0f;
+
+    //Path finding
+    pathfinder->currentWayPoint = 1; //Update to next. Move toward next object.
+    pathfinder->speed = 100.0f;
+
+}
+
 
 void Scene::RobotInteraction(float deltatime)
 {

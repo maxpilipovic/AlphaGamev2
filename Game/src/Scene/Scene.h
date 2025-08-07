@@ -1,76 +1,84 @@
-#pragma once
-#include "Astra/Astra.hpp"
-#include "../Renderer/Renderer.h"
-#include "Components.h"
+#pragma once  
+#include "Astra/Astra.hpp"  
+#include "../Renderer/Renderer.h"  
+#include "Components.h"  
+#include "../Paths.h" 
 
-class InputManager;
+class InputManager;  
 
-enum class RobotType {
-    Red,
-    Green,
-    Blue,
-    Yellow
-};
+enum class RobotType {  
+    Red,  
+    Green,  
+    Blue,  
+    Yellow  
+};  
 
-enum class TankType {
-    Teal,
-    Orange,
-    Violet,
-    Red
-};
+enum class TankType {  
+    Teal,  
+    Orange,  
+    Violet,  
+    Red  
+};  
 
-class Scene
-{
-public:
-	Scene() = default;
+class Scene  
+{  
+public:  
+    Scene() = default;  
 
-	void Initialize(std::shared_ptr<InputManager>);
-	void Shutdown();
-	void Update(float deltatime);
-	void Render(Renderer* renderer);
-	Astra::Entity CreateEntity();
-	void DestroyEntity(Astra::Entity);
+    void Initialize(std::shared_ptr<InputManager>);  
+    void Shutdown();  
+    void Update(float deltatime);  
+    void Render(Renderer* renderer);  
+    Astra::Entity CreateEntity();  
+    void DestroyEntity(Astra::Entity);  
 
-    //Creation
-    void CreateRobot(RobotType robot);
-    void CreateTank(TankType tank);
-    void CreateProjectile(Astra::Entity& robot, Astra::Entity& tank);
+    // Creation  
+    void CreateRobot(RobotType robot);  
+    void CreateTank(TankType tank);  
+    void CreateProjectile(Astra::Entity& robot, Astra::Entity& tank);  
 
-    //Updating
-    void UpdatePlacingEntity();
-    void FinalizePlacingEntity();
-    bool IsPlacingEntityColliding();
-	void UpdateProjectiles(float deltatime);
-    void RobotInteraction(float deltatime);
+    // Updating  
+    void UpdatePlacingEntity();  
+    void FinalizePlacingEntity();  
+    bool IsPlacingEntityColliding();  
+    void UpdateProjectiles(float deltatime);  
+    void RobotInteraction(float deltatime);  
 
-	//Astra::Entity FindEntity(const std::string& name) const;
+    // Tanks Spawning  
+    void SpawnEnemyTank();  
+    void UpdateTankPathing(float deltatime);  
 
-    template<typename T, typename... Args>
-    T* AddComponent(Astra::Entity entity, Args&&... args)
-    {
-        return m_registry.AddComponent<T>(entity, std::forward<Args>(args)...);
-    }
+    // Astra::Entity FindEntity(const std::string& name) const;  
 
-    template<typename T>
-    T* GetComponent(Astra::Entity entity)
-    {
-        return m_registry.GetComponent<T>(entity);
-    }
+    template<typename T, typename... Args>  
+    T* AddComponent(Astra::Entity entity, Args&&... args)  
+    {  
+        return m_registry.AddComponent<T>(entity, std::forward<Args>(args)...);  
+    }  
 
-    // Registry access
-    Astra::Registry& GetRegistry() { return m_registry; }
-    const Astra::Registry& GetRegistry() const { return m_registry; }
+    template<typename T>  
+    T* GetComponent(Astra::Entity entity)  
+    {  
+        return m_registry.GetComponent<T>(entity);  
+    }  
 
-    bool IsActive() const { return m_active; }
+    // Registry access  
+    Astra::Registry& GetRegistry() { return m_registry; }  
+    const Astra::Registry& GetRegistry() const { return m_registry; }  
 
+    bool IsActive() const { return m_active; }  
 
-private:
-    void UpdatePhysics(float deltaTime);
+private:  
+    void UpdatePhysics(float deltaTime);  
 
-	Astra::Registry m_registry;
-	bool m_active = false;
-	std::vector<Astra::Entity> m_entities;
-    std::shared_ptr<InputManager> m_inputManager;
-    bool m_placingEntity = false; //Flag for checking if placing or not
-    Astra::Entity m_currentPlacingEntity; //Entity state for placing
+    Astra::Registry m_registry;  
+    bool m_active = false;  
+    std::vector<Astra::Entity> m_entities;  
+    std::shared_ptr<InputManager> m_inputManager;  
+    bool m_placingEntity = false; // Flag for checking if placing or not  
+    Astra::Entity m_currentPlacingEntity; // Entity state for placing  
+
+    // Spawning Tanks  
+    float m_tankSpawnTimer = 0.0f;  
+    float m_tankSpawnInterval = 5.0f;  
 };

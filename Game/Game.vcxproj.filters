@@ -31,6 +31,9 @@
     <ClInclude Include="src\Core\Math.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="Paths.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\InputManager.cpp">
@@ -47,5 +50,8 @@
       <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="Paths.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
