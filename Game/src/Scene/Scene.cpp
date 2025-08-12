@@ -203,18 +203,10 @@ void Scene::RobotInteraction(float deltatime)
     for (const auto& [robotEntityConst, robotTransform, robot, robotRange] : robots)
     {
         Astra::Entity robotEntity = robotEntityConst; //Mutable copy of the entity
-
-        //If hits robot
-        /*if (robot.target)
-        {
-            if (Math::Distance(robotTransform.x, robotTransform.y, m_registry.GetComponent<Transform>(robot.target)->x, m_registry.GetComponent<Transform>(robot.target)->y) > robotRange.radius)
-            {
-                robot.target = Astra::Entity{};
-                break; ??? Maybe break?
-            }
-        }*/
-
-        if (!robot.target)
+  
+        
+        //If its not valid
+        if (!m_registry.Valid(robot.target))
         {
             for (const auto& [tankEntity, tankTransform, tank] : tanks)
             {
@@ -228,9 +220,26 @@ void Scene::RobotInteraction(float deltatime)
                 }
             }
         }
-
-        if (robot.target && robot.fireCooldown <= 0.0f && m_placingEntity == false)
+        else 
         {
+            for (const auto& [tankEntity, tankTransform, tank] : tanks)
+            {
+                if (m_registry.HasComponent<Transform>(tankEntity))
+                {
+                    if (Math::Distance(robotTransform.x, robotTransform.y, tankTransform.x, tankTransform.y) > robotRange.radius)
+                    {
+                        robot.target = Astra::Entity::Null();
+                        break;
+                    }
+                }
+            }
+        }
+
+
+
+        if (robot.target && robot.fireCooldown <= 0.0f && m_placingEntity == false )
+        {
+
             CreateProjectile(robotEntity, robot.target);
             robot.fireCooldown = 1.0f / robot.fireRate;
         }
@@ -550,11 +559,18 @@ void Scene::CreateProjectile(Astra::Entity& robot, Astra::Entity& tank)
 	auto transform = GetComponent<Transform>(projectile);
 	auto robotTransform = GetComponent<Transform>(robot);
 	auto tankTransform = GetComponent<Transform>(tank);
+    auto tank2 = GetComponent<Tank>(tank);
 
 	transform->x = robotTransform->x;
 	transform->y = robotTransform->y;
 	transform->width = 10.0f;
 	transform->height = 10.0f;
+
+    //Check tankTransform and robotTransform null ptr
+    if (!tankTransform || !robotTransform ||!transform)
+    {
+        return;
+    }
 
 	auto proj = GetComponent<Projectile>(projectile);
 	proj->directionAngle = atan2(tankTransform->y - robotTransform->y, tankTransform->x - robotTransform->x);
