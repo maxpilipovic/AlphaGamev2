@@ -2,7 +2,7 @@
 #include "Astra/Astra.hpp"  
 #include "../Renderer/Renderer.h"  
 #include "Components.h"  
-#include "../Paths.h" 
+#include "../Core/Paths.h" 
 
 class InputManager;  
 
@@ -29,7 +29,17 @@ public:
     void Shutdown();  
     void Update(float deltatime);  
     void Render(Renderer* renderer);  
-    Astra::Entity CreateEntity();  
+    
+    // Create entity with components added atomically
+    // Can be called with no template parameters for just Transform
+    template<typename... Components>
+    Astra::Entity CreateEntity()
+    {
+        Astra::Entity entity = m_registry.CreateEntity<Transform, Components...>(Transform{}, Components{}...);
+        m_entities.push_back(entity);
+        return entity;
+    }
+    
     void DestroyEntity(Astra::Entity);  
 
     // Creation  

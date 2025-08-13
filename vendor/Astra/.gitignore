@@ -1,59 +1,41 @@
-# Prerequisites
-*.d
-
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Linker files
-*.ilk
-
-# Debugger Files
-*.pdb
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
-
-# debug information files
-*.dwo
-
-.vs/
-
+# Build directories
+bin/
 bin-int/
 
-tests/
-
-include/Astra/Container/DenseMap.hpp
-
-include/Astra/Container/PackedArray.hpp
-
-include/Astra/Container/SparseSet.hpp
-
+# IDE project files
+ide/
 *.sln
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.db
+*.opendb
+.vs/
 
-*.vcxproj
+# OS files
+.DS_Store
+Thumbs.db
 
-*.filters
+# Premake generated files
+Makefile
+*.make
+*.xcworkspace
+*.xcodeproj
+
+# Visual Studio Code
+.vscode/
+
+# CLion / IntelliJ
+.idea/
+cmake-build-*/
+
+# Compiled files
+*.o
+*.obj
+*.a
+*.lib
+*.dll
+*.so
+*.dylib
+*.exe

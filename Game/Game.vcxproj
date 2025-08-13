@@ -162,9 +162,9 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Paths.h" />
     <ClInclude Include="src\Core\InputManager.h" />
     <ClInclude Include="src\Core\Math.h" />
+    <ClInclude Include="src\Core\Paths.h" />
     <ClInclude Include="src\Core\Window.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
@@ -172,8 +172,8 @@
     <ClInclude Include="src\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Paths.cpp" />
     <ClCompile Include="src\Core\InputManager.cpp" />
+    <ClCompile Include="src\Core\Paths.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />

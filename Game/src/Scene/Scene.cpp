@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include <algorithm>
+#include <iostream>
 #include "../Core/InputManager.h"
 #include <SDL3/SDL.h>
 #include <core/Math.h>
@@ -90,10 +91,9 @@ void Scene::Update(float deltatime)
     }
 
     //Update all tanks and robots in registry
-	auto robots = m_registry.GetView<Transform, Robot, RobotRange>();
-	auto tanks = m_registry.GetView<Transform, Tank>();
+	auto robots = m_registry.CreateView<Transform, Robot, RobotRange>();
 
-	for (const auto& [entity, transform, robot, range]: robots)
+	for (const auto& [entity, transform, robot, range] : robots)
 	{
         RobotInteraction(deltatime);
 	}
@@ -107,28 +107,31 @@ void Scene::Update(float deltatime)
 
 void Scene::UpdateTankPathing(float deltatime)
 {
-    auto tanks = m_registry.GetView<Transform, Tank, PathFollower>();
+    auto tanks = m_registry.CreateView<Transform, Tank, PathFollower>();
+
+    // Collect entities to destroy (deferred destruction)
+    std::vector<Astra::Entity> entitiesToDestroy;
 
     for (const auto& [entity, transform, tank, follower] : tanks)
     {
 
         //End of path
-        if (follower.currentWayPoint >= enemyPathL1.size())
+        if (follower->currentWayPoint >= enemyPathL1.size())
         {
-            DestroyEntity(entity);
+            entitiesToDestroy.push_back(entity);
             continue;
         }
 
         //Get the current target and calculate the distance 
-        SDL_FPoint target = enemyPathL1[follower.currentWayPoint];
-        float dx = target.x - transform.x;
-        float dy = target.y - transform.y;
+        SDL_FPoint target = enemyPathL1[follower->currentWayPoint];
+        float dx = target.x - transform->x;
+        float dy = target.y - transform->y;
         float distance = std::sqrt(dx * dx + dy * dy);
 
         //Less then a pixel just move it anyway.
         if (distance < 1.0f)
         {
-            follower.currentWayPoint++;
+            follower->currentWayPoint++;
             
         }
 
@@ -138,21 +141,21 @@ void Scene::UpdateTankPathing(float deltatime)
         float normY = dy / distance;
 
         //Moves the tank
-        transform.x += normX * follower.speed * deltatime;
-        transform.y += normY * follower.speed * deltatime;
+        transform->x += normX * follower->speed * deltatime;
+        transform->y += normY * follower->speed * deltatime;
 
         //Moves the sprite
         auto sprite = GetComponent<SpriteRendererComponent>(entity);
         if (sprite) {
-            sprite->sprite.x = transform.x;
-            sprite->sprite.y = transform.y;
+            sprite->sprite.x = transform->x;
+            sprite->sprite.y = transform->y;
         }
 
         //Moves the circle collider
         auto circle = GetComponent<CircleCollider>(entity);
         if (circle) {
-            float centerX = transform.x + (sprite ? sprite->sprite.w * 0.5f : 0.0f);
-            float centerY = transform.y + (sprite ? sprite->sprite.h * 0.5f : 0.0f);
+            float centerX = transform->x + (sprite ? sprite->sprite.w * 0.5f : 0.0f);
+            float centerY = transform->y + (sprite ? sprite->sprite.h * 0.5f : 0.0f);
             circle->x = centerX;
             circle->y = centerY;
         }
@@ -162,17 +165,24 @@ void Scene::UpdateTankPathing(float deltatime)
 
 
     }
+
+    // Destroy entities after iteration completes
+    for (Astra::Entity entity : entitiesToDestroy)
+    {
+        DestroyEntity(entity);
+    }
 }
 
 void Scene::SpawnEnemyTank()
 {
-    Astra::Entity spawnedTank = CreateEntity();
+    // Create entity with all components atomically
+    Astra::Entity spawnedTank = CreateEntity<Tank, OrangeTank, PathFollower, SpriteRendererComponent, CircleCollider>();
+    
+    // Get component pointers after all components are added
     auto transform = GetComponent<Transform>(spawnedTank);
-    auto tank = AddComponent<Tank>(spawnedTank);
-    auto orangeTank = AddComponent<OrangeTank>(spawnedTank);
-    auto pathfinder = AddComponent<PathFollower>(spawnedTank);
-    auto sprite = AddComponent<SpriteRendererComponent>(spawnedTank);
-    auto circle = AddComponent<CircleCollider>(spawnedTank);
+    auto pathfinder = GetComponent<PathFollower>(spawnedTank);
+    auto sprite = GetComponent<SpriteRendererComponent>(spawnedTank);
+    auto circle = GetComponent<CircleCollider>(spawnedTank);
 
     transform->x = enemyPathL1[0].x;
     transform->y = enemyPathL1[0].y;
@@ -197,8 +207,8 @@ void Scene::SpawnEnemyTank()
 
 void Scene::RobotInteraction(float deltatime)
 {
-    auto robots = m_registry.GetView<Transform, Robot, RobotRange>();
-    auto tanks = m_registry.GetView<Transform, Tank>();
+    auto robots = m_registry.CreateView<Transform, Robot, RobotRange>();
+    auto tanks = m_registry.CreateView<Transform, Tank>();
 
     for (const auto& [robotEntityConst, robotTransform, robot, robotRange] : robots)
     {
@@ -206,17 +216,14 @@ void Scene::RobotInteraction(float deltatime)
   
         
         //If its not valid
-        if (!m_registry.Valid(robot.target))
+        if (!m_registry.IsValid(robot->target))
         {
             for (const auto& [tankEntity, tankTransform, tank] : tanks)
             {
-                if (m_registry.HasComponent<Transform>(tankEntity))
+                if (Math::Distance(robotTransform->x, robotTransform->y, tankTransform->x, tankTransform->y) <= robotRange->radius)
                 {
-                    if (Math::Distance(robotTransform.x, robotTransform.y, tankTransform.x, tankTransform.y) <= robotRange.radius)
-                    {
-                        robot.target = tankEntity;
-                        break;
-                    }
+                    robot->target = tankEntity;
+                    break;
                 }
             }
         }
@@ -224,29 +231,24 @@ void Scene::RobotInteraction(float deltatime)
         {
             for (const auto& [tankEntity, tankTransform, tank] : tanks)
             {
-                if (m_registry.HasComponent<Transform>(tankEntity))
+                if (Math::Distance(robotTransform->x, robotTransform->y, tankTransform->x, tankTransform->y) > robotRange->radius)
                 {
-                    if (Math::Distance(robotTransform.x, robotTransform.y, tankTransform.x, tankTransform.y) > robotRange.radius)
-                    {
-                        robot.target = Astra::Entity::Null();
-                        break;
-                    }
+                    robot->target = Astra::Entity::Invalid();
+                    break;
                 }
             }
         }
 
-
-
-        if (robot.target && robot.fireCooldown <= 0.0f && m_placingEntity == false )
+        if (robot->target && robot->fireCooldown <= 0.0f && m_placingEntity == false )
         {
 
-            CreateProjectile(robotEntity, robot.target);
-            robot.fireCooldown = 1.0f / robot.fireRate;
+            CreateProjectile(robotEntity, robot->target);
+            robot->fireCooldown = 1.0f / robot->fireRate;
         }
 
-        if (robot.fireCooldown > 0.0f)
+        if (robot->fireCooldown > 0.0f)
         {
-            robot.fireCooldown -= deltatime;
+            robot->fireCooldown -= deltatime;
         }
     }
 }
@@ -254,7 +256,7 @@ void Scene::RobotInteraction(float deltatime)
 bool Scene::IsPlacingEntityColliding()
 {
     auto placingCircle = GetComponent<CircleCollider>(m_currentPlacingEntity);
-    auto view = m_registry.GetView<Robot, CircleCollider>();
+    auto view = m_registry.CreateView<Robot, CircleCollider>();
 
     for (const auto& [entity, _, circle] : view)
     {
@@ -268,7 +270,7 @@ bool Scene::IsPlacingEntityColliding()
             return false;
         }
 
-        if (Math::IsCircleColliding(placingCircle->x, placingCircle->y, placingCircle->radius, circle.x, circle.y, circle.radius))
+        if (Math::IsCircleColliding(placingCircle->x, placingCircle->y, placingCircle->radius, circle->x, circle->y, circle->radius))
         {
             return true;
         }
@@ -294,6 +296,8 @@ void Scene::FinalizePlacingEntity()
     transform->y = m_inputManager->getY();
     sprite->sprite.x = transform->x;
     sprite->sprite.y = transform->y;
+    sprite->sprite.w = transform->width;  // Preserve width
+    sprite->sprite.h = transform->height; // Preserve height
 
     float centerX = transform->x + (sprite->sprite.w * 0.5);
     float centerY = transform->y + (sprite->sprite.h * 0.5);
@@ -321,9 +325,17 @@ void Scene::UpdatePlacingEntity()
     transform->x = m_inputManager->getX();
     transform->y = m_inputManager->getY();
 
+    //Update sprite rect - position and dimensions
+    if (sprite) {
+        sprite->sprite.x = transform->x;
+        sprite->sprite.y = transform->y;
+        sprite->sprite.w = transform->width;
+        sprite->sprite.h = transform->height;
+    }
+
     //Update sprite rect
-    float centerX = transform->x + (sprite->sprite.w * 0.5);
-    float centerY = transform->y + (sprite->sprite.h * 0.5);
+    float centerX = transform->x + (sprite ? sprite->sprite.w * 0.5 : 0);
+    float centerY = transform->y + (sprite ? sprite->sprite.h * 0.5 : 0);
 
     circle->x = centerX;
     circle->y = centerY;
@@ -331,65 +343,70 @@ void Scene::UpdatePlacingEntity()
 
 void Scene::CreateTank(TankType tank)
 {
-    m_currentPlacingEntity = CreateEntity();
+    // Create entity with all common components atomically
+    m_currentPlacingEntity = CreateEntity<SpriteRendererComponent, CircleCollider, Tank>();
+    
+    // Add the type-specific component
+    switch (tank)
+    {
+    case TankType::Orange:
+        AddComponent<OrangeTank>(m_currentPlacingEntity);
+        break;
+    case TankType::Red:
+        AddComponent<RedTank>(m_currentPlacingEntity);
+        break;
+    case TankType::Teal:
+        AddComponent<TealTank>(m_currentPlacingEntity);
+        break;
+    case TankType::Violet:
+        AddComponent<VioletTank>(m_currentPlacingEntity);
+        break;
+    }
 
+    // NOW get component pointers after ALL components are added (entity is in final archetype)
     auto transform = GetComponent<Transform>(m_currentPlacingEntity);
-    auto sprite = AddComponent<SpriteRendererComponent>(m_currentPlacingEntity);
-    auto circle = AddComponent<CircleCollider>(m_currentPlacingEntity);
+    auto sprite = GetComponent<SpriteRendererComponent>(m_currentPlacingEntity);
+    auto circle = GetComponent<CircleCollider>(m_currentPlacingEntity);
 
-    //Add to seperate other colliders...
-    AddComponent<Tank>(m_currentPlacingEntity);
-
-    circle->radius = 40.0f;
-
-    if (!transform || !sprite) return;
+    if (!transform || !sprite || !circle) return;
 
     //Set initial position
     transform->x = m_inputManager->getX();
     transform->y = m_inputManager->getY();
     transform->width = 50.0f;
     transform->height = 50.0f;
+    
+    circle->radius = 40.0f;
 
-    //Assign initial sprite rect
-    sprite->sprite = { transform->x, transform->y, transform->width, transform->height };
+    //Assign initial sprite rect - MUST include width and height!
+    sprite->sprite.x = transform->x;
+    sprite->sprite.y = transform->y;
+    sprite->sprite.w = transform->width;
+    sprite->sprite.h = transform->height;
 
-    //Assign color based on key
-
+    //Assign color based on type
     switch (tank)
     {
     case TankType::Orange:
-    {
-        AddComponent<OrangeTank>(m_currentPlacingEntity);
-        //Why do this?
         sprite->red = 255;
         sprite->green = 165;
         sprite->blue = 0;
         break;
-    }
     case TankType::Red:
-    {
-        AddComponent<RedTank>(m_currentPlacingEntity);
         sprite->red = 255;
         sprite->green = 0;
         sprite->blue = 0;
         break;
-    }
     case TankType::Teal:
-    {
-        AddComponent<TealTank>(m_currentPlacingEntity);
         sprite->red = 0;
         sprite->green = 128;
         sprite->blue = 128;
         break;
-    }
     case TankType::Violet:
-    {
-        AddComponent<VioletTank>(m_currentPlacingEntity);
         sprite->red = 238;
         sprite->green = 130;
         sprite->blue = 238;
         break;
-    }
     default:
         break;
     }
@@ -401,70 +418,75 @@ void Scene::CreateTank(TankType tank)
 
 void Scene::CreateRobot(RobotType robot)
 {
-    m_currentPlacingEntity = CreateEntity();
+    // Create entity with all common components atomically
+    m_currentPlacingEntity = CreateEntity<SpriteRendererComponent, CircleCollider, RobotRange, Robot>();
+    
+    // Add the type-specific component
+    switch (robot)
+    {
+    case RobotType::Blue:
+        AddComponent<BlueRobot>(m_currentPlacingEntity);
+        break;
+    case RobotType::Red:
+        AddComponent<RedRobot>(m_currentPlacingEntity);
+        break;
+    case RobotType::Green:
+        AddComponent<GreenRobot>(m_currentPlacingEntity);
+        break;
+    case RobotType::Yellow:
+        AddComponent<YellowRobot>(m_currentPlacingEntity);
+        break;
+    }
 
+    // NOW get component pointers after ALL components are added (entity is in final archetype)
     auto transform = GetComponent<Transform>(m_currentPlacingEntity);
-    auto sprite = AddComponent<SpriteRendererComponent>(m_currentPlacingEntity);
-    auto circle = AddComponent<CircleCollider>(m_currentPlacingEntity);
-    auto range = AddComponent<RobotRange>(m_currentPlacingEntity);
+    auto sprite = GetComponent<SpriteRendererComponent>(m_currentPlacingEntity);
+    auto circle = GetComponent<CircleCollider>(m_currentPlacingEntity);
+    auto range = GetComponent<RobotRange>(m_currentPlacingEntity);
 
-    //Add to seperate other colliders...
-    AddComponent<Robot>(m_currentPlacingEntity);
-
-    circle->radius = 40.0f;
-
-    if (!transform || !sprite) return;
+    if (!transform || !sprite || !circle || !range) return;
 
     //Set initial position
     transform->x = m_inputManager->getX();
     transform->y = m_inputManager->getY();
     transform->width = 50.0f;
     transform->height = 50.0f;
+    
+    circle->radius = 40.0f;
 
-    //Assign initial sprite rect
-    sprite->sprite = { transform->x, transform->y, transform->width, transform->height };
+    //Assign initial sprite rect - MUST include width and height!
+    sprite->sprite.x = transform->x;
+    sprite->sprite.y = transform->y;
+    sprite->sprite.w = transform->width;
+    sprite->sprite.h = transform->height;
 
-    //Assign color based on key
-
+    //Assign color and range based on type
     switch (robot)
     {
     case RobotType::Blue:
-    {
-        AddComponent<BlueRobot>(m_currentPlacingEntity);
-        //Why do this?
         sprite->red = 0;
         sprite->green = 0;
         sprite->blue = 255;
         range->radius = 100;
         break;
-    }
     case RobotType::Red:
-    {
-        AddComponent<RedRobot>(m_currentPlacingEntity);
         sprite->red = 255;
         sprite->green = 0;
         sprite->blue = 0;
         range->radius = 125;
         break;
-    }
     case RobotType::Green:
-    {
-        AddComponent<GreenRobot>(m_currentPlacingEntity);
         sprite->red = 0;
         sprite->green = 255;
         sprite->blue = 0;
         range->radius = 175;
         break;
-    }
     case RobotType::Yellow:
-    {
-        AddComponent<YellowRobot>(m_currentPlacingEntity);
         sprite->red = 255;
         sprite->green = 255;
         sprite->blue = 0;
         range->radius = 250;
         break;
-    }
     default:
         break;
     }
@@ -481,56 +503,40 @@ void Scene::Render(Renderer* renderer)
     //and then render them.
 
     //Robots
-    auto view = m_registry.GetView<Transform, SpriteRendererComponent, RobotRange, CircleCollider>();
+    auto view = m_registry.CreateView<Transform, SpriteRendererComponent, CircleCollider, Astra::Optional<RobotRange>, Astra::Optional<Tank>>();
 
-    //Tanks
-    auto view2 = m_registry.GetView<Transform, SpriteRendererComponent, Tank, CircleCollider>();
-
-
-    for (const auto& [entity, transform, sprite, range, circle] : view) //Structured binding
+    for (const auto& [entity, transform, sprite, circle, range, tank] : view) //Structured binding
     {
         //Ask ethana about this?
-        sprite.sprite.x = transform.x;
-        sprite.sprite.y = transform.y;
-        renderer->SetDrawColor(sprite.red, sprite.green, sprite.blue, sprite.alpha);
-        renderer->FillRect(&sprite.sprite);
+        sprite->sprite.x = transform->x;
+        sprite->sprite.y = transform->y;
+        renderer->SetDrawColor(sprite->red, sprite->green, sprite->blue, sprite->alpha);
+        renderer->FillRect(&sprite->sprite);
 
-        renderer->SetDrawColor(0, 0, 0, 255); //Black
-        renderer->DrawCircle(circle.x, circle.y, circle.radius);
+        if (tank)
+        {
+            renderer->SetDrawColor(sprite->red, sprite->green, sprite->blue, sprite->alpha);
+        }
+        else
+        {
+            renderer->SetDrawColor(0, 0, 0, 255); //Black
+        }
+        renderer->DrawCircle(circle->x, circle->y, circle->radius);
 
-        renderer->DrawCircle(range.x, range.y, range.radius);
-        
-
-
+        if (range)
+        {
+            renderer->DrawCircle(range->x, range->y, range->radius);
+        }
     }
 
-    for (const auto& [entity, transform, sprite, tank, circle] : view2)
-    {
-        sprite.sprite.x = transform.x;
-        sprite.sprite.y = transform.y;
-        renderer->SetDrawColor(sprite.red, sprite.green, sprite.blue, sprite.alpha);
-        renderer->FillRect(&sprite.sprite);
-
-        //renderer->SetDrawColor(0, 0, 0, 255); //Black
-        renderer->DrawCircle(circle.x, circle.y, circle.radius);
-    }
-
-	auto projectiles = m_registry.GetView<Transform, SpriteRendererComponent, Projectile>();
+	auto projectiles = m_registry.CreateView<Transform, SpriteRendererComponent, Projectile>();
 	for (const auto& [entity, transform, sprite, projectile] : projectiles)
 	{
-		sprite.sprite.x = transform.x;
-		sprite.sprite.y = transform.y;
-		renderer->SetDrawColor(sprite.red, sprite.green, sprite.blue, sprite.alpha);
-		renderer->FillRect(&sprite.sprite);
+		sprite->sprite.x = transform->x;
+		sprite->sprite.y = transform->y;
+		renderer->SetDrawColor(sprite->red, sprite->green, sprite->blue, sprite->alpha);
+		renderer->FillRect(&sprite->sprite);
 	}
-}
-
-Astra::Entity Scene::CreateEntity()
-{
-	Astra::Entity entity = m_registry.CreateEntity();
-    m_registry.AddComponent<Transform>(entity);
-    m_entities.push_back(entity);
-	return entity; //Returns id
 }
 
 void Scene::DestroyEntity(Astra::Entity entity)
@@ -553,31 +559,31 @@ void Scene::UpdatePhysics(float deltaTime)
 
 void Scene::CreateProjectile(Astra::Entity& robot, Astra::Entity& tank)
 {
-	auto projectile = CreateEntity();
-	AddComponent<Projectile>(projectile);
-
+	// Create entity with all components atomically
+	auto projectile = CreateEntity<Projectile, SpriteRendererComponent>();
+	
+	// Get component pointers after all components are added
 	auto transform = GetComponent<Transform>(projectile);
 	auto robotTransform = GetComponent<Transform>(robot);
 	auto tankTransform = GetComponent<Transform>(tank);
-    auto tank2 = GetComponent<Tank>(tank);
+	auto proj = GetComponent<Projectile>(projectile);
+	auto sprite = GetComponent<SpriteRendererComponent>(projectile);
+
+	//Check null ptr
+	if (!tankTransform || !robotTransform || !transform)
+	{
+		return;
+	}
 
 	transform->x = robotTransform->x;
 	transform->y = robotTransform->y;
 	transform->width = 10.0f;
 	transform->height = 10.0f;
 
-    //Check tankTransform and robotTransform null ptr
-    if (!tankTransform || !robotTransform ||!transform)
-    {
-        return;
-    }
-
-	auto proj = GetComponent<Projectile>(projectile);
 	proj->directionAngle = atan2(tankTransform->y - robotTransform->y, tankTransform->x - robotTransform->x);
 	proj->velocity = 500.0f;
 	proj->lifetime = 5.0f;
 
-	auto sprite = AddComponent<SpriteRendererComponent>(projectile);
 	sprite->sprite = { transform->x, transform->y, transform->width, transform->height };
 	sprite->red = 255;
 	sprite->green = 255;
@@ -586,31 +592,40 @@ void Scene::CreateProjectile(Astra::Entity& robot, Astra::Entity& tank)
 
 void Scene::UpdateProjectiles(float deltaTime)
 {
-	auto projectiles = m_registry.GetView<Transform, Projectile>();
-	auto tanks = m_registry.GetView<Transform, Tank, CircleCollider>();
+	auto projectiles = m_registry.CreateView<Transform, Projectile>();
+	auto tanks = m_registry.CreateView<Transform, Tank, CircleCollider>();
+
+	// Collect entities to destroy (deferred destruction)
+	std::vector<Astra::Entity> entitiesToDestroy;
 
 	for (const auto& [projEntity, projTransform, projectile] : projectiles)
 	{
 
-		projectile.age += deltaTime;
-		if (projectile.age > projectile.lifetime)
+		projectile->age += deltaTime;
+		if (projectile->age > projectile->lifetime)
 		{
-			DestroyEntity(projEntity);
+			entitiesToDestroy.push_back(projEntity);
 			continue;
 		}
 
-		projTransform.x += cos(projectile.directionAngle) * projectile.velocity * deltaTime;
-        projTransform.y += sin(projectile.directionAngle) * projectile.velocity * deltaTime;
+		projTransform->x += cos(projectile->directionAngle) * projectile->velocity * deltaTime;
+        projTransform->y += sin(projectile->directionAngle) * projectile->velocity * deltaTime;
 
 		//for (const auto& [tankEntity, tankTransform, tank, circle] : tanks)
 		//{
   //          //Colides destroy both
 		//	if (Math::IsCircleColliding(projTransform.x, projTransform.y, projTransform.width / 2, tankTransform.x, tankTransform.y, circle.radius))
 		//	{
-		//		DestroyEntity(tankEntity);
-		//		DestroyEntity(projEntity);
+		//		entitiesToDestroy.push_back(tankEntity);
+		//		entitiesToDestroy.push_back(projEntity);
 		//		break;
 		//	}
 		//}
+	}
+
+	// Destroy entities after iteration completes
+	for (Astra::Entity entity : entitiesToDestroy)
+	{
+		DestroyEntity(entity);
 	}
 }
