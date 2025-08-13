@@ -3,6 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Game\Game.vcxproj", "{7FA9857C-6BE0-860D-14CD-6C1000E3020F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreeType", "vendor\FreeType\FreeType.vcxproj", "{49610F50-352E-6A5B-5E47-58034A739FE9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_image", "vendor\SDL_image\SDL_image.vcxproj", "{4A537F37-B6BD-33AE-FFFB-E4536BA51103}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SDL_ttf", "vendor\SDL3_ttf-3.2.2\SDL_ttf.vcxproj", "{D575159D-4155-9438-4A6D-1F0FB6CBFA99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -16,6 +22,24 @@ Global
 		{7FA9857C-6BE0-860D-14CD-6C1000E3020F}.Dist|x64.Build.0 = Dist|x64
 		{7FA9857C-6BE0-860D-14CD-6C1000E3020F}.Release|x64.ActiveCfg = Release|x64
 		{7FA9857C-6BE0-860D-14CD-6C1000E3020F}.Release|x64.Build.0 = Release|x64
+		{49610F50-352E-6A5B-5E47-58034A739FE9}.Debug|x64.ActiveCfg = Debug|x64
+		{49610F50-352E-6A5B-5E47-58034A739FE9}.Debug|x64.Build.0 = Debug|x64
+		{49610F50-352E-6A5B-5E47-58034A739FE9}.Dist|x64.ActiveCfg = Dist|x64
+		{49610F50-352E-6A5B-5E47-58034A739FE9}.Dist|x64.Build.0 = Dist|x64
+		{49610F50-352E-6A5B-5E47-58034A739FE9}.Release|x64.ActiveCfg = Release|x64
+		{49610F50-352E-6A5B-5E47-58034A739FE9}.Release|x64.Build.0 = Release|x64
+		{4A537F37-B6BD-33AE-FFFB-E4536BA51103}.Debug|x64.ActiveCfg = Debug|x64
+		{4A537F37-B6BD-33AE-FFFB-E4536BA51103}.Debug|x64.Build.0 = Debug|x64
+		{4A537F37-B6BD-33AE-FFFB-E4536BA51103}.Dist|x64.ActiveCfg = Dist|x64
+		{4A537F37-B6BD-33AE-FFFB-E4536BA51103}.Dist|x64.Build.0 = Dist|x64
+		{4A537F37-B6BD-33AE-FFFB-E4536BA51103}.Release|x64.ActiveCfg = Release|x64
+		{4A537F37-B6BD-33AE-FFFB-E4536BA51103}.Release|x64.Build.0 = Release|x64
+		{D575159D-4155-9438-4A6D-1F0FB6CBFA99}.Debug|x64.ActiveCfg = Debug|x64
+		{D575159D-4155-9438-4A6D-1F0FB6CBFA99}.Debug|x64.Build.0 = Debug|x64
+		{D575159D-4155-9438-4A6D-1F0FB6CBFA99}.Dist|x64.ActiveCfg = Dist|x64
+		{D575159D-4155-9438-4A6D-1F0FB6CBFA99}.Dist|x64.Build.0 = Dist|x64
+		{D575159D-4155-9438-4A6D-1F0FB6CBFA99}.Release|x64.ActiveCfg = Release|x64
+		{D575159D-4155-9438-4A6D-1F0FB6CBFA99}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

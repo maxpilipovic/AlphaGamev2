@@ -79,7 +79,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;__SSE2__;__SSE4_2__;PLATFORM_WINDOWS;DEBUG;ASTRA_BUILD_DEBUG;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\vendor\sdl3\include;..\vendor\SDL_image\include;..\vendor\Astra\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\vendor\sdl3\include;..\vendor\SDL_image\include;..\vendor\SDL3_ttf-3.2.2\SDL3_ttf-3.2.2\include;..\vendor\Astra\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -95,7 +95,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>SDL3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\vendor\sdl3\lib\x64;..\vendor\SDL_image\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\vendor\sdl3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy /B /Y $(SolutionDir)\vendor\sdl3\lib\x64\SDL3.dll ..\bin\Debug-windows-x86_64\Game</Command>
@@ -106,7 +106,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;__SSE2__;__SSE4_2__;PLATFORM_WINDOWS;RELEASE;ASTRA_BUILD_RELEASE;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\vendor\sdl3\include;..\vendor\SDL_image\include;..\vendor\Astra\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\vendor\sdl3\include;..\vendor\SDL_image\include;..\vendor\SDL3_ttf-3.2.2\SDL3_ttf-3.2.2\include;..\vendor\Astra\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -125,7 +125,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>SDL3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\vendor\sdl3\lib\x64;..\vendor\SDL_image\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\vendor\sdl3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy /B /Y $(SolutionDir)\vendor\sdl3\lib\x64\SDL3.dll ..\bin\Release-windows-x86_64\Game</Command>
@@ -136,7 +136,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;__SSE2__;__SSE4_2__;PLATFORM_WINDOWS;DIST;ASTRA_BUILD_RELEASE;_HAS_EXCEPTIONS=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;..\vendor\sdl3\include;..\vendor\SDL_image\include;..\vendor\Astra\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;..\vendor\sdl3\include;..\vendor\SDL_image\include;..\vendor\SDL3_ttf-3.2.2\SDL3_ttf-3.2.2\include;..\vendor\Astra\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -155,7 +155,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>SDL3.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\vendor\sdl3\lib\x64;..\vendor\SDL_image\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\vendor\sdl3\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>copy /B /Y $(SolutionDir)\vendor\sdl3\lib\x64\SDL3.dll ..\bin\Dist-windows-x86_64\Game</Command>
@@ -179,6 +179,17 @@
     <ClCompile Include="src\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\vendor\SDL_image\SDL_image.vcxproj">
+      <Project>{4A537F37-B6BD-33AE-FFFB-E4536BA51103}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\vendor\SDL3_ttf-3.2.2\SDL_ttf.vcxproj">
+      <Project>{D575159D-4155-9438-4A6D-1F0FB6CBFA99}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\vendor\FreeType\FreeType.vcxproj">
+      <Project>{49610F50-352E-6A5B-5E47-58034A739FE9}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

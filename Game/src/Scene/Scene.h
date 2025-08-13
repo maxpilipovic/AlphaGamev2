@@ -31,6 +31,8 @@ public:
     void Render(Renderer* renderer);  
     
     // Create entity with components added atomically
+    // comment
+    // //sdasdas
     // Can be called with no template parameters for just Transform
     template<typename... Components>
     Astra::Entity CreateEntity()

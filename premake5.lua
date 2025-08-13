@@ -27,7 +27,13 @@ archmap["ARM64"] = "arm64"
 IncludeDir = {}
 IncludeDir["SDL3"] = "vendor/sdl3/include"
 IncludeDir["SDL_image"] = "vendor/SDL_image/include"
+IncludeDir["SDL_ttf"] = "vendor/SDL3_ttf-3.2.2/SDL3_ttf-3.2.2/include"
 IncludeDir["Astra"] = "vendor/Astra/include"
+
+-- Include library projects
+include "vendor/SDL_image"
+include "vendor/FreeType"
+include "vendor/SDL3_ttf-3.2.2"
 
 project "Game"
     location "Game"
@@ -62,19 +68,21 @@ project "Game"
         "%{prj.name}/src",
         "%{IncludeDir.SDL3}",
         "%{IncludeDir.SDL_image}",
+        "%{IncludeDir.SDL_ttf}",
         "%{IncludeDir.Astra}"
     }
     
     libdirs
     {
-        "vendor/sdl3/lib/%{archmap[cfg.architecture] or cfg.architecture}",
-        "vendor/SDL_image/lib/%{archmap[cfg.architecture] or cfg.architecture}"
+        "vendor/sdl3/lib/%{archmap[cfg.architecture] or cfg.architecture}"
     }
     
     links
     {
-        "SDL3"
-        --"SDL3_image"
+        "SDL3",
+        "SDL_image",
+        "SDL_ttf",
+        "FreeType"
     }
 
     filter "system:windows"

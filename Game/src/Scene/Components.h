@@ -22,6 +22,7 @@ struct Projectile {
 	float directionAngle;
 	float lifetime;
 	float age = 0.0f; //Time since spawned!
+	float damage = 2.0f;
 };
 
 struct PathFollower {
@@ -30,7 +31,7 @@ struct PathFollower {
 };
 
 struct Tank {
-	float health = 5.0f;
+	float health = 6.0f;
 };
 
 struct OrangeTank {

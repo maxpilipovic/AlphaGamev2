@@ -76,7 +76,6 @@ void Scene::Update(float deltatime)
         SpawnEnemyTank();
         m_tankSpawnTimer = 0.0f;
     }
-
     
     //Update tank movement
     UpdateTankPathing(deltatime);
@@ -575,8 +574,8 @@ void Scene::CreateProjectile(Astra::Entity& robot, Astra::Entity& tank)
 		return;
 	}
 
-	transform->x = robotTransform->x;
-	transform->y = robotTransform->y;
+	transform->x = robotTransform->x + (robotTransform->width/2) - (transform->width/2);
+	transform->y = robotTransform->y + (robotTransform->height/2) - (transform->height/2);
 	transform->width = 10.0f;
 	transform->height = 10.0f;
 
@@ -611,16 +610,29 @@ void Scene::UpdateProjectiles(float deltaTime)
 		projTransform->x += cos(projectile->directionAngle) * projectile->velocity * deltaTime;
         projTransform->y += sin(projectile->directionAngle) * projectile->velocity * deltaTime;
 
-		//for (const auto& [tankEntity, tankTransform, tank, circle] : tanks)
-		//{
-  //          //Colides destroy both
-		//	if (Math::IsCircleColliding(projTransform.x, projTransform.y, projTransform.width / 2, tankTransform.x, tankTransform.y, circle.radius))
-		//	{
-		//		entitiesToDestroy.push_back(tankEntity);
-		//		entitiesToDestroy.push_back(projEntity);
-		//		break;
-		//	}
-		//}
+		//Apply damage to tanks.
+        for (const auto& [tankEntity, tankTransform, tank, tankCircle] : tanks)
+        {
+            float projCenterX = projTransform->x + projTransform->width / 2;
+            float projCenterY = projTransform->y + projTransform->height / 2;
+
+            float dx = projCenterX - tankCircle->x;
+            float dy = projCenterY - tankCircle->y;
+            //Tank distance
+            float distance = std::sqrt(dx * dx + dy * dy);
+
+            if (distance < tankCircle->radius)
+            {
+                tank->health -= projectile->damage;
+                entitiesToDestroy.push_back(projEntity);
+
+                if (tank->health <= 0)
+                {
+                    entitiesToDestroy.push_back(tankEntity);
+                }
+                break;
+            }
+        }
 	}
 
 	// Destroy entities after iteration completes
