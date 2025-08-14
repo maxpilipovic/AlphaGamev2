@@ -25,6 +25,10 @@ struct Projectile {
 	float damage = 2.0f;
 };
 
+struct PathNode {
+	SDL_FPoint pos;
+};
+
 struct PathFollower {
 	int currentWayPoint = 0;
 	float speed = 100.0f;

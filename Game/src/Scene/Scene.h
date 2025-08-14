@@ -58,7 +58,10 @@ public:
 
     // Tanks Spawning  
     void SpawnEnemyTank();  
-    void UpdateTankPathing(float deltatime);  
+    void UpdateTankPathing(float deltatime);
+
+    //UI
+    void DrawEnemyPath(Renderer* renderer, std::vector<SDL_FPoint> path);
 
     // Astra::Entity FindEntity(const std::string& name) const;  
 
@@ -93,4 +96,8 @@ private:
     // Spawning Tanks  
     float m_tankSpawnTimer = 0.0f;  
     float m_tankSpawnInterval = 5.0f;  
+
+    //Draw width of path
+    bool m_drawPath = true; //Toggle for visualisation
+    float m_widthPath = 80.0f;
 };

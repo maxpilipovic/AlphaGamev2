@@ -536,6 +536,110 @@ void Scene::Render(Renderer* renderer)
 		renderer->SetDrawColor(sprite->red, sprite->green, sprite->blue, sprite->alpha);
 		renderer->FillRect(&sprite->sprite);
 	}
+
+    //BATTLEFIELD
+    DrawEnemyPath(renderer, enemyPathL1);
+    
+}
+
+SDL_FPoint GetPerpendicularOffset(SDL_FPoint p1, SDL_FPoint p2, float width) {
+    // Calculate direction vector
+    float dx = p2.x - p1.x;
+    float dy = p2.y - p1.y;
+
+    // Calculate length
+    float length = sqrt(dx * dx + dy * dy);
+
+    // Normalize and rotate 90 degrees to get perpendicular
+    float perpX = -dy / length * width;
+    float perpY = dx / length * width;
+
+    return { perpX, perpY };
+}
+
+SDL_FPoint LineIntersection(SDL_FPoint p1, SDL_FPoint dir1, SDL_FPoint p2, SDL_FPoint dir2) {
+    float det = dir1.x * dir2.y - dir1.y * dir2.x;
+    if (abs(det) < 0.001f) return p1; // Lines are parallel
+
+    float u = ((p2.x - p1.x) * dir2.y - (p2.y - p1.y) * dir2.x) / det;
+    return { p1.x + u * dir1.x, p1.y + u * dir1.y };
+}
+
+float GetAngle(SDL_FPoint v1, SDL_FPoint v2) {
+    float dot = v1.x * v2.x + v1.y * v2.y;
+    float mag1 = sqrt(v1.x * v1.x + v1.y * v1.y);
+    float mag2 = sqrt(v2.x * v2.x + v2.y * v2.y);
+    return acos(dot / (mag1 * mag2));
+}
+
+void Scene::DrawEnemyPath(Renderer* renderer, std::vector<SDL_FPoint> path)
+{   
+    std::vector<SDL_FPoint> leftBorder;
+    std::vector<SDL_FPoint> rightBorder;
+    float pathWidth = m_widthPath;
+    float miterLimit = 2.0f; // Limit miter length
+
+    // Calculate border points with proper joints
+    for (int i = 0; i < path.size(); i++) {
+        if (i == 0) {
+            // First point - just calculate perpendicular
+            SDL_FPoint offset = GetPerpendicularOffset(path[0], path[1], pathWidth / 2.0f);
+            leftBorder.push_back({ path[0].x + offset.x, path[0].y + offset.y });
+            rightBorder.push_back({ path[0].x - offset.x, path[0].y - offset.y });
+        }
+        else if (i == path.size() - 1) {
+            // Last point - just calculate perpendicular
+            SDL_FPoint offset = GetPerpendicularOffset(path[i - 1], path[i], pathWidth / 2.0f);
+            leftBorder.push_back({ path[i].x + offset.x, path[i].y + offset.y });
+            rightBorder.push_back({ path[i].x - offset.x, path[i].y - offset.y });
+        }
+        else {
+            // Middle points - find intersection of adjacent border lines
+            SDL_FPoint offset1 = GetPerpendicularOffset(path[i - 1], path[i], pathWidth / 2.0f);
+            SDL_FPoint offset2 = GetPerpendicularOffset(path[i], path[i + 1], pathWidth / 2.0f);
+
+            // Calculate direction vectors for the path segments
+            SDL_FPoint dir1 = { path[i].x - path[i - 1].x, path[i].y - path[i - 1].y };
+            SDL_FPoint dir2 = { path[i + 1].x - path[i].x, path[i + 1].y - path[i].y };
+
+            // Check if the angle is too sharp for miter joint
+            float angle = GetAngle(dir1, dir2);
+
+            if (sin(angle / 2.0f) < 1.0f / miterLimit) {
+                // Use bevel joint for sharp corners
+                leftBorder.push_back({ path[i].x + offset1.x, path[i].y + offset1.y });
+                rightBorder.push_back({ path[i].x - offset1.x, path[i].y - offset1.y });
+            }
+            else {
+                // Find intersections for miter joint
+                SDL_FPoint leftP1 = { path[i].x + offset1.x, path[i].y + offset1.y };
+                SDL_FPoint leftP2 = { path[i].x + offset2.x, path[i].y + offset2.y };
+                SDL_FPoint leftIntersection = LineIntersection(leftP1, dir1, leftP2, dir2);
+
+                SDL_FPoint rightP1 = { path[i].x - offset1.x, path[i].y - offset1.y };
+                SDL_FPoint rightP2 = { path[i].x - offset2.x, path[i].y - offset2.y };
+                SDL_FPoint rightIntersection = LineIntersection(rightP1, dir1, rightP2, dir2);
+
+                leftBorder.push_back(leftIntersection);
+                rightBorder.push_back(rightIntersection);
+            }
+        }
+    }
+
+    // Draw the border lines
+    renderer->SetDrawColor(255, 0, 0, 255);
+
+    // Draw left border
+    for (int i = 1; i < leftBorder.size(); i++) {
+        renderer->DrawLine(leftBorder[i - 1].x, leftBorder[i - 1].y,
+            leftBorder[i].x, leftBorder[i].y);
+    }
+
+    // Draw right border
+    for (int i = 1; i < rightBorder.size(); i++) {
+        renderer->DrawLine(rightBorder[i - 1].x, rightBorder[i - 1].y,
+            rightBorder[i].x, rightBorder[i].y);
+    }
 }
 
 void Scene::DestroyEntity(Astra::Entity entity)
