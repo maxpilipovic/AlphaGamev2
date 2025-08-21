@@ -60,6 +60,9 @@ public:
     void SpawnEnemyTank();  
     void UpdateTankPathing(float deltatime);
 
+    //PathZone Entity
+    bool UpdatePathZone();
+
     //UI
     void DrawEnemyPath(Renderer* renderer, std::vector<SDL_FPoint> path);
 
@@ -96,6 +99,9 @@ private:
     // Spawning Tanks  
     float m_tankSpawnTimer = 0.0f;  
     float m_tankSpawnInterval = 5.0f;  
+
+    //Create path entity
+    Astra::Entity m_pathZone;
 
     //Draw width of path
     bool m_drawPath = true; //Toggle for visualisation

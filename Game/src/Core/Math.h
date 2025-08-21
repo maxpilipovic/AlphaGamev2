@@ -19,4 +19,24 @@ namespace Math
 		return distance <= r1 + r2;
 	}
 
+	bool PointInPolygon(const SDL_FPoint& point, const std::vector<SDL_FPoint>& polygon)
+	{
+		bool isInside = false;
+		int n = polygon.size();
+
+		for (int i = 0, j = n - 1; i < n; j = i++)
+		{
+			const SDL_FPoint& pointi = polygon[i];
+			const SDL_FPoint& pointj = polygon[j];
+
+			if (((pointi.y > point.y) != (pointj.y > point.y)) &&
+				(point.x < (pointj.x - pointi.x) * (point.y - pointi.y) / (pointj.y - pointi.y) + pointi.x))
+			{
+				isInside = !isInside;
+			}
+		}
+
+		return isInside;
+
+	}
 }

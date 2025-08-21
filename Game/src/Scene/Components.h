@@ -25,6 +25,18 @@ struct Projectile {
 	float damage = 2.0f;
 };
 
+struct PathCollision
+{
+	std::vector<SDL_FPoint> leftBorder;
+	std::vector<SDL_FPoint> rightBorder;
+	std::vector<SDL_FPoint> polygon;
+
+	void Serialize(auto& ar)
+	{
+		ar(leftBorder)(rightBorder)(polygon);
+	}
+};
+
 struct PathNode {
 	SDL_FPoint pos;
 };

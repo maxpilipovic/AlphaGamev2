@@ -9,7 +9,7 @@ void Scene::Initialize(std::shared_ptr<InputManager> inputManager)
 {
     //This is where you can set up your scene, load resources, etc.
     m_inputManager = inputManager; //Input manager is passed here
-
+    m_pathZone = CreateEntity<PathCollision>();
     // Load the player's sprite
 
 }
@@ -76,7 +76,7 @@ void Scene::Update(float deltatime)
         SpawnEnemyTank();
         m_tankSpawnTimer = 0.0f;
     }
-    
+
     //Update tank movement
     UpdateTankPathing(deltatime);
 
@@ -84,9 +84,10 @@ void Scene::Update(float deltatime)
     UpdatePlacingEntity();
 
    //Place it
-    if (!IsPlacingEntityColliding())
+    if (!IsPlacingEntityColliding() && !UpdatePathZone())
     {
         FinalizePlacingEntity();
+
     }
 
     //Update all tanks and robots in registry
@@ -102,6 +103,29 @@ void Scene::Update(float deltatime)
 
     //Update physics (idk if I have any for this project)
     UpdatePhysics(deltatime);
+}
+
+bool Scene::UpdatePathZone()
+{
+
+    //Grab pointer
+    auto pPointer = GetComponent<PathCollision>(m_pathZone);
+    auto EntityView = m_registry.CreateView<Transform, Robot>();
+
+    for (const auto& [entity, transform, robot] : EntityView)
+    {
+
+        SDL_FPoint point = { transform->x, transform->y };
+
+        if (Math::PointInPolygon(point, pPointer->polygon))
+        {
+            std::cout << "OVERLAPPING ON PATH" << std::endl;
+            return true;
+        }
+    }
+
+    return false;
+   
 }
 
 void Scene::UpdateTankPathing(float deltatime)
@@ -628,6 +652,26 @@ void Scene::DrawEnemyPath(Renderer* renderer, std::vector<SDL_FPoint> path)
 
     // Draw the border lines
     renderer->SetDrawColor(255, 0, 0, 255);
+
+    //Store inside ecs
+    auto pcp = GetComponent<PathCollision>(m_pathZone);
+    pcp->leftBorder = leftBorder;
+    pcp->rightBorder = rightBorder;
+    
+    //Clear 
+    pcp->polygon.clear();
+
+    //Add
+    for (const auto& point : leftBorder)
+    {
+        pcp->polygon.push_back(point);
+    }
+
+    for (int i = rightBorder.size() - 1; i >= 0; i--)
+    {
+        pcp->polygon.push_back(rightBorder[i]);
+    }
+
 
     // Draw left border
     for (int i = 1; i < leftBorder.size(); i++) {
