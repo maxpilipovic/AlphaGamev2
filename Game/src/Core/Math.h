@@ -39,4 +39,12 @@ namespace Math
 		return isInside;
 
 	}
+
+	float PointToSegmentDistance(const SDL_FPoint& p, const SDL_FPoint& a, const SDL_FPoint& b) {
+		float l2 = (b.x - a.x) * (b.x - a.x) + (b.y - a.y) * (b.y - a.y);
+		if (l2 == 0.0f) return Distance(p.x, p.y, a.x, a.y);
+		float t = std::max(0.0f, std::min(1.0f, ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / l2));
+		SDL_FPoint projection = { a.x + t * (b.x - a.x), a.y + t * (b.y - a.y) };
+		return Distance(p.x, p.y, projection.x, projection.y);
+	}
 }

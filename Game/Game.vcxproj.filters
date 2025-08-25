@@ -10,6 +10,9 @@
     <Filter Include="Scene">
       <UniqueIdentifier>{B3F7140E-1F0C-3DBF-E88D-E01E546139F0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{83755900-6F01-880B-D8AF-880BC45A880B}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Core\InputManager.h">
@@ -34,6 +37,9 @@
     <ClInclude Include="src\Scene\Scene.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\UI\UI.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\InputManager.cpp">
@@ -51,6 +57,9 @@
     </ClCompile>
     <ClCompile Include="src\Scene\Scene.cpp">
       <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UI\UI.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>

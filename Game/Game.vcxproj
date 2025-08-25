@@ -170,6 +170,7 @@
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Scene\Components.h" />
     <ClInclude Include="src\Scene\Scene.h" />
+    <ClInclude Include="src\UI\UI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\InputManager.cpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
+    <ClCompile Include="src\UI\UI.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
   <ItemGroup>

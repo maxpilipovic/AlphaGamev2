@@ -4,6 +4,7 @@
 #include "Renderer/Renderer.h"
 #include "Core/InputManager.h"
 #include "Scene/Scene.h"
+#include "UI/UI.h"
 
 //Constructor
 
@@ -12,6 +13,7 @@ Game::Game() :
 	m_renderer(std::make_unique<Renderer>()),
 	m_inputManager(std::make_shared<InputManager>()),
     m_scene(std::make_unique<Scene>()),
+	m_UI(std::make_unique<UI>()),
 	m_isRunning(false),
 	m_lastFrameTime(0)
 { 

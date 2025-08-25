@@ -106,5 +106,13 @@ struct RobotRange
 	float radius;
 };
 
+//Components for UI
+struct TextComponent
+{
 
+};
 
+struct ButtonComponent
+{
+
+};

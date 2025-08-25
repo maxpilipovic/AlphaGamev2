@@ -9,7 +9,7 @@ void Scene::Initialize(std::shared_ptr<InputManager> inputManager)
 {
     //This is where you can set up your scene, load resources, etc.
     m_inputManager = inputManager; //Input manager is passed here
-    m_pathZone = CreateEntity<PathCollision>();
+    m_pathZone = CreateEntity<PathCollision, CircleCollider>();
     // Load the player's sprite
 
 }
@@ -107,25 +107,40 @@ void Scene::Update(float deltatime)
 
 bool Scene::UpdatePathZone()
 {
-
-    //Grab pointer
     auto pPointer = GetComponent<PathCollision>(m_pathZone);
-    auto EntityView = m_registry.CreateView<Transform, Robot>();
-
-    for (const auto& [entity, transform, robot] : EntityView)
+    if (!pPointer || pPointer->polygon.empty())
     {
+        return false; // No path to collide with
+    }
 
-        SDL_FPoint point = { transform->x, transform->y };
+    auto EntityView = m_registry.CreateView<Transform, CircleCollider, Robot>();
 
-        if (Math::PointInPolygon(point, pPointer->polygon))
+    for (const auto& [entity, transform, circle, robot] : EntityView)
+    {
+        SDL_FPoint circleCenter = { circle->x, circle->y };
+
+        //Check if the circle's center is inside the polygon
+        if (Math::PointInPolygon(circleCenter, pPointer->polygon))
         {
-            std::cout << "OVERLAPPING ON PATH" << std::endl;
+            std::cout << "OVERLAPPING ON PATH (Center Inside)" << std::endl;
             return true;
+        }
+
+        //Check if the circle intersects with any of the polygon's edges
+        for (size_t i = 0; i < pPointer->polygon.size(); ++i)
+        {
+            const SDL_FPoint& p1 = pPointer->polygon[i];
+            const SDL_FPoint& p2 = pPointer->polygon[(i + 1) % pPointer->polygon.size()]; //Wrap around for the last edge
+
+            if (Math::PointToSegmentDistance(circleCenter, p1, p2) < circle->radius)
+            {
+                std::cout << "OVERLAPPING ON PATH (Edge Intersection)" << std::endl;
+                return true;
+            }
         }
     }
 
     return false;
-   
 }
 
 void Scene::UpdateTankPathing(float deltatime)
