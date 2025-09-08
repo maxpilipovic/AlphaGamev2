@@ -13,7 +13,7 @@ Game::Game() :
 	m_renderer(std::make_unique<Renderer>()),
 	m_inputManager(std::make_shared<InputManager>()),
     m_scene(std::make_unique<Scene>()),
-	m_UI(std::make_unique<UI>()),
+	//m_UI(std::make_unique<UI>()),
 	m_isRunning(false),
 	m_lastFrameTime(0)
 { 
@@ -42,7 +42,7 @@ bool Game::Initialize(const std::string& title, int width, int height)
 	}
 
 	m_scene->Initialize(m_inputManager);
-
+	m_UI.Initialize(m_scene.get(), m_renderer.get());
 	
 	/*Astra::Entity player = m_scene->CreateEntity();
 	m_scene->AddComponent<PlayerComponent>(player);

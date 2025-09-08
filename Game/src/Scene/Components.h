@@ -106,13 +106,37 @@ struct RobotRange
 	float radius;
 };
 
-//Components for UI
-struct TextComponent
+//UI STUFF
+
+//Position and size of component
+struct UITransformComponent {
+	SDL_FPoint Position = { 0.0f, 0.0f };
+	SDL_FPoint Size = { 100.0f, 50.0f };
+};
+
+//Visual info??? Image?
+struct UIImageComponent
 {
 
 };
 
-struct ButtonComponent
+//Actual text... Data?
+struct UITextComponent
 {
 
 };
+
+//enum class or enum?
+enum class ButtonState
+{
+	Normal,
+	Hovered,
+	Pressed
+};
+
+//Make button interactive. Different colors?
+struct UIButtonComponent
+{
+
+};
+

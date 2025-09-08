@@ -15,6 +15,7 @@ void Scene::Initialize(std::shared_ptr<InputManager> inputManager)
 }
 
 void Scene::Shutdown()
+
 {
     //This is where you can clean up your scene, unload resources, etc.
     m_entities.clear();

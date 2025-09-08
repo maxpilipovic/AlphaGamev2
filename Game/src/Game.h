@@ -28,7 +28,8 @@ private:
     std::unique_ptr<Renderer> m_renderer;
     std::shared_ptr<InputManager> m_inputManager;
     std::unique_ptr<Scene> m_scene;
-    std::unique_ptr<UI> m_UI;
+    UI m_UI;
+    //std::unique_ptr<UI> m_UI;
     bool m_isRunning;
 
     uint64_t m_lastFrameTime;
