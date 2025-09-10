@@ -1,45 +1,105 @@
-#include "UI/UI.h"
+#include "UI.h"
+#include "../Core/Paths.h"
+#include <iostream>
 
-void UI::Initialize(Scene* scene, Renderer* renderer)
+UI::UI(Scene* scene, Renderer* renderer) : m_Scene(scene), m_Renderer(renderer), m_Font(nullptr)
 {
-	m_Scene = scene;
-	m_Renderer = renderer;
 }
 
-void UI::Update(InputManager* input)
+UI::~UI()
 {
-
-	//Check if scene null.
-	if (!m_Scene || !input)
+	if (m_Font)
 	{
-		return;
+		TTF_CloseFont(m_Font);
 	}
+}
 
-	//Grab a list registry...
-	//Loop through everything, CHECK if button was pressed.
-	//Do something if button pressed...
+void UI::Init()
+{
+	//Note: You might want a more robust path solution
 
-	auto& registry = m_Scene->GetRegistry();
+	//Initalize the font
 
-	//Grab the view?
-	auto view = registry.CreateView<UIButtonComponent, UITransformComponent>();
-
-	for (auto entity : view)
+	/*std::string fontPath = Paths::GetAssetsPath() + "/Open_Sans/static/OpenSans-Regular.ttf";
+	m_Font = TTF_OpenFont(fontPath.c_str(), 24);
+	if (!m_Font)
 	{
-		//Work with speicifc components
+		std::cerr << "Failed to load font: " << std::endl;
+	}*/
+}
+
+void UI::Update(float dt)
+{
+	float mouseX, mouseY;
+	SDL_GetMouseState(&mouseX, &mouseY);
+
+
+	auto view = m_Scene->GetRegistry().CreateView<UIButtonComponent, UITransformComponent>();
+	for (auto [entity, button, transform] : view)
+	{	
+
+		if (!button->Visible) continue; //False
+
+		SDL_FRect buttonRect = { transform->Position.x, transform->Position.y, transform->Size.x, transform->Size.y };
+		SDL_FPoint mousePoint = { mouseX, mouseY };
+
+		if (SDL_PointInRectFloat(&mousePoint, &buttonRect))
+		{
+			if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_MASK(SDL_BUTTON_LEFT))
+			{
+				button->State = ButtonState::Pressed;
+			}
+			else
+			{
+				button->State = ButtonState::Hovered;
+			}
+		}
+		else
+		{
+			button->State = ButtonState::Normal;
+		}
 	}
-
-
-
-
 }
 
 void UI::Render()
 {
-	if (!m_Scene || !m_Renderer)
+	auto imageView = m_Scene->GetRegistry().CreateView<UIImageComponent, UITransformComponent>();
+	for (auto [entity, image, transform] : imageView)
 	{
-		return;
+
+		if (image->Visible && image->Texture)
+		{
+			SDL_FRect destRect = { transform->Position.x, transform->Position.y, transform->Size.x, transform->Size.y };
+
+			//potential bug??
+			const SDL_Rect* srcRect = image->SrcRect.w > 0 && image->SrcRect.h > 0 ? &image->SrcRect : nullptr;
+			m_Renderer->RenderCopy(image->Texture, srcRect, &destRect);
+		}
 	}
 
+	auto textView = m_Scene->GetRegistry().CreateView<UITextComponent, UITransformComponent>();
+	for (auto [entity, text, transform] : textView)
+	{
 
+		if (text->Visible && !text->Text.empty())
+		{
+			TTF_Font* font = text->Font ? text->Font : m_Font;
+			if (!font) continue;
+
+			SDL_Surface* surface = TTF_RenderText_Blended(font, text->Text.c_str(), text->Color);
+			SDL_Texture* texture = SDL_CreateTextureFromSurface(m_Renderer->GetSDLRenderer(), surface);
+			
+			//potential bug??
+			SDL_FRect destRect = { transform->Position.x, transform->Position.y, (float)surface->w, (float)surface->h };
+			m_Renderer->RenderCopy(texture, nullptr, &destRect);
+
+			SDL_DestroySurface(surface);
+			SDL_DestroyTexture(texture);
+		}
+	}
+}
+
+void UI::HandleEvent(SDL_Event& event)
+{
+	// Handle events if needed
 }

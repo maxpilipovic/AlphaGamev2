@@ -1,22 +1,24 @@
 #pragma once
-#include "../Scene/Scene.h"
 
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include "../Scene/Scene.h"
+#include "../Scene/Components.h"
+#include "../Renderer/Renderer.h"
 
 class UI
 {
-
 public:
+	UI(Scene* scene, Renderer* renderer);
+	~UI();
 
-	UI() = default;
-	void Initialize(Scene* scene, Renderer* renderer);
+	void Init();
+	void Update(float dt);
 	void Render();
-	void Update(InputManager* input);
-	//Creates default constructor and deconstructor for both if not specified.
-
+	void HandleEvent(SDL_Event& event);
 
 private:
-	UI* m_ui;
 	Scene* m_Scene;
 	Renderer* m_Renderer;
-
+	TTF_Font* m_Font;
 };

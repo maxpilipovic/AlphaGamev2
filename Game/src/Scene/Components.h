@@ -1,5 +1,11 @@
 #pragma once
 
+#include <string>
+#include <vector>
+#include <SDL3/SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
+#include <Astra/Entity/Entity.hpp>
+
 struct Transform {
 	float x, y;
 	float width, height;
@@ -117,13 +123,19 @@ struct UITransformComponent {
 //Visual info??? Image?
 struct UIImageComponent
 {
-
+	SDL_Texture* Texture = nullptr;
+	SDL_Rect SrcRect = { 0, 0, 0, 0 };
+	SDL_Color Color = { 255, 255, 255, 255 };
+	bool Visible = true;
 };
 
 //Actual text... Data?
 struct UITextComponent
 {
-
+	std::string Text;
+	TTF_Font* Font = nullptr;
+	SDL_Color Color = { 255, 255, 255, 255 };
+	bool Visible = true;
 };
 
 //enum class or enum?
@@ -137,6 +149,10 @@ enum class ButtonState
 //Make button interactive. Different colors?
 struct UIButtonComponent
 {
+	ButtonState State = ButtonState::Normal;
+	bool Visible = true;
 
+	// std::function<void()> OnClick;
+	// std::function<void()> OnHover;
 };
 

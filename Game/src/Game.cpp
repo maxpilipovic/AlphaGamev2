@@ -13,7 +13,6 @@ Game::Game() :
 	m_renderer(std::make_unique<Renderer>()),
 	m_inputManager(std::make_shared<InputManager>()),
     m_scene(std::make_unique<Scene>()),
-	//m_UI(std::make_unique<UI>()),
 	m_isRunning(false),
 	m_lastFrameTime(0)
 { 
@@ -42,7 +41,8 @@ bool Game::Initialize(const std::string& title, int width, int height)
 	}
 
 	m_scene->Initialize(m_inputManager);
-	m_UI.Initialize(m_scene.get(), m_renderer.get());
+	m_UI = std::make_unique<UI>(m_scene.get(), m_renderer.get());
+	m_UI->Init();
 	
 	/*Astra::Entity player = m_scene->CreateEntity();
 	m_scene->AddComponent<PlayerComponent>(player);
@@ -71,6 +71,7 @@ void Game::Run()
 				m_isRunning = false;
 			}
 			m_inputManager->ProcessEvent(event);
+			m_UI->HandleEvent(event);
 		}
 
 		Uint64 currentTime = SDL_GetPerformanceCounter();
@@ -98,6 +99,7 @@ void Game::Update(float deltaTime)
 	}
 
     m_scene->Update(deltaTime);
+	 m_UI->Update(deltaTime);
 }
 
 void Game::Render()
@@ -106,6 +108,8 @@ void Game::Render()
 	m_renderer->Clear(); //What is this?
 
     m_scene->Render(m_renderer.get()); //What are we doing here? //Rendering everything to scene?
+
+	m_UI->Render();
 
 	m_renderer->Present(); //What is this?
 }
