@@ -88,6 +88,7 @@ void Game::Shutdown()
     m_scene->Shutdown();
 	m_renderer.reset();
 	m_window.reset();
+	TTF_Quit();
 	SDL_Quit();
 }
 

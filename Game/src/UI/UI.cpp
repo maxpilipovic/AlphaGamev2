@@ -1,5 +1,5 @@
 #include "UI.h"
-#include "../Core/Paths.h"
+#include "../Core/PathUtils.h"
 #include <iostream>
 
 UI::UI(Scene* scene, Renderer* renderer) : m_Scene(scene), m_Renderer(renderer), m_Font(nullptr)
@@ -20,12 +20,12 @@ void UI::Init()
 
 	//Initalize the font
 
-	/*std::string fontPath = Paths::GetAssetsPath() + "/Open_Sans/static/OpenSans-Regular.ttf";
+	std::string fontPath = PathUtils::GetAssetsPath() + "Open_Sans/static/OpenSans-Regular.ttf";
 	m_Font = TTF_OpenFont(fontPath.c_str(), 24);
 	if (!m_Font)
 	{
-		std::cerr << "Failed to load font: " << std::endl;
-	}*/
+		std::cerr << "Failed to load font: "  << std::endl;
+	}
 }
 
 void UI::Update(float dt)
@@ -72,8 +72,17 @@ void UI::Render()
 			SDL_FRect destRect = { transform->Position.x, transform->Position.y, transform->Size.x, transform->Size.y };
 
 			//potential bug??
-			const SDL_Rect* srcRect = image->SrcRect.w > 0 && image->SrcRect.h > 0 ? &image->SrcRect : nullptr;
-			m_Renderer->RenderCopy(image->Texture, srcRect, &destRect);
+			SDL_FRect srcFRect;
+			const SDL_FRect* srcFRectPtr = nullptr;
+			if (image->SrcRect.w > 0 && image->SrcRect.h > 0)
+			{
+				srcFRect.x = (float)image->SrcRect.x;
+				srcFRect.y = (float)image->SrcRect.y;
+				srcFRect.w = (float)image->SrcRect.w;
+				srcFRect.h = (float)image->SrcRect.h;
+				srcFRectPtr = &srcFRect;
+			}
+			m_Renderer->RenderCopy(image->Texture, srcFRectPtr, &destRect);
 		}
 	}
 
@@ -86,7 +95,7 @@ void UI::Render()
 			TTF_Font* font = text->Font ? text->Font : m_Font;
 			if (!font) continue;
 
-			SDL_Surface* surface = TTF_RenderText_Blended(font, text->Text.c_str(), text->Color);
+			SDL_Surface* surface = TTF_RenderText_Blended(font, text->Text.c_str(), 0, text->Color);
 			SDL_Texture* texture = SDL_CreateTextureFromSurface(m_Renderer->GetSDLRenderer(), surface);
 			
 			//potential bug??

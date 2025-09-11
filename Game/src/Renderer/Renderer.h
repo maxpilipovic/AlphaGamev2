@@ -24,7 +24,7 @@ public:
     void DrawCircle(int centerX, int centerY, int radius);
 
     SDL_Texture* LoadTexture(const char* path);
-    void RenderCopy(SDL_Texture* texture, const SDL_Rect* srcRect, const SDL_FRect* destRect);
+    void RenderCopy(SDL_Texture* texture, const SDL_FRect* srcRect, const SDL_FRect* destRect);
 
     SDL_Renderer* GetSDLRenderer() const { return m_renderer; }
 

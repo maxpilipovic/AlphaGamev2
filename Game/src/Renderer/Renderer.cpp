@@ -117,5 +117,22 @@ void Renderer::DrawCircle(int centerX, int centerY, int radius)
 	}
 }
 
+void Renderer::RenderCopy(SDL_Texture* texture, const SDL_FRect* srcRect, const SDL_FRect* destRect)
+{
+    if (m_renderer && texture)
+    {
+        SDL_RenderTexture(m_renderer, texture, srcRect, destRect);
+    }
+}
+
+SDL_Texture* Renderer::LoadTexture(const char* path)
+{
+    if (!m_renderer)
+    {
+        return nullptr;
+    }
+    return IMG_LoadTexture(m_renderer, path);
+}
+
 
 
