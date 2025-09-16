@@ -12,6 +12,24 @@ void Scene::Initialize(std::shared_ptr<InputManager> inputManager)
     m_pathZone = CreateEntity<PathCollision, CircleCollider>();
     // Load the player's sprite
 
+
+    //Buttons
+    std::string buttonText = "Blue Tank! $150";
+    CreateButton(1150, 25, 100, 50, buttonText);
+
+    std::string buttonText2 = "Green Tank! $300";
+    CreateButton(1150, 80, 100, 50, buttonText2);
+
+    std::string buttonText3 = "Red Tank! $450";
+    CreateButton(1150, 135, 100, 50, buttonText3);
+
+    std::string buttonText4 = "Yellow Tank! $600";
+    CreateButton(1150, 190, 100, 50, buttonText4);
+
+    //Text
+    std::string displayHealth = "Health : ";
+    CreateText(500, 100, displayHealth);
+    
 }
 
 void Scene::Shutdown()
@@ -798,10 +816,49 @@ void Scene::UpdateProjectiles(float deltaTime)
             }
         }
 	}
+    
 
+    
 	// Destroy entities after iteration completes
 	for (Astra::Entity entity : entitiesToDestroy)
 	{
 		DestroyEntity(entity);
 	}
+}
+
+//UI STUFF
+//BUTTON ENTITY CREATION FACTORY
+Astra::Entity Scene::CreateButton(float x, float y, float width, float height, std::string& string)
+{
+    Astra::Entity buttonEntity = CreateEntity<UITransformComponent, UITextComponent, UIButtonComponent>();
+    auto transformPointer = GetComponent<UITransformComponent>(buttonEntity);
+    auto textPointer = GetComponent<UITextComponent>(buttonEntity);
+
+    //Might not need this
+    //auto buttonPointer = GetComponent<ButtonState>(buttonEntity);
+
+    transformPointer->Position.x = x;
+    transformPointer->Position.y = y;
+    transformPointer->Size.x = width;
+    transformPointer->Size.y = height;
+
+    textPointer->Text = string;
+    textPointer->Color = { 255, 255, 255, 255 }; //white
+
+    return buttonEntity;
+}
+
+Astra::Entity Scene::CreateText(float x, float y, std::string& string)
+{
+    Astra::Entity textEntity = CreateEntity<UITransformComponent, UITextComponent>();
+    auto transformPointer = GetComponent<UITransformComponent>(textEntity);
+    auto textPointer = GetComponent<UITextComponent>(textEntity);
+
+    transformPointer->Size.x = x;
+    transformPointer->Size.y = y;
+
+    textPointer->Text = string;
+
+
+    return textEntity;
 }

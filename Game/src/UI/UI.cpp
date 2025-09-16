@@ -20,11 +20,16 @@ void UI::Init()
 
 	//Initalize the font
 
-	std::string fontPath = PathUtils::GetAssetsPath() + "Open_Sans/static/OpenSans-Regular.ttf";
-	m_Font = TTF_OpenFont(fontPath.c_str(), 24);
+	if (TTF_Init() == -1) {
+		std::cerr << "Failed to initialize SDL_ttf: " << std::endl;
+		return;
+	}
+
+	std::string fontPath = PathUtils::GetAssetsPath() + "Open_Sans/OpenSans-VariableFont_wdth,wght.ttf";
+	m_Font = TTF_OpenFont(fontPath.c_str(), 10);
 	if (!m_Font)
 	{
-		std::cerr << "Failed to load font: "  << std::endl;
+		std::cerr << "Failed to load font: "  << SDL_GetError() << std::endl;
 	}
 }
 
@@ -63,6 +68,29 @@ void UI::Update(float dt)
 
 void UI::Render()
 {
+    auto buttonView = m_Scene->GetRegistry().CreateView<UIButtonComponent, UITransformComponent>();
+    for (auto [entity, button, transform] : buttonView)
+    {
+        if (button->Visible)
+        {
+            SDL_FRect buttonRect = { transform->Position.x, transform->Position.y, transform->Size.x, transform->Size.y };
+
+            switch (button->State)
+            {
+                case ButtonState::Normal:
+                    m_Renderer->SetDrawColor(100, 100, 100, 255); // Grey
+                    break;
+                case ButtonState::Hovered:
+                    m_Renderer->SetDrawColor(150, 150, 150, 255); // Lighter Grey
+                    break;
+                case ButtonState::Pressed:
+                    m_Renderer->SetDrawColor(50, 50, 50, 255); // Darker Grey
+                    break;
+            }
+            m_Renderer->FillRect(&buttonRect);
+        }
+    }
+
 	auto imageView = m_Scene->GetRegistry().CreateView<UIImageComponent, UITransformComponent>();
 	for (auto [entity, image, transform] : imageView)
 	{
@@ -95,7 +123,7 @@ void UI::Render()
 			TTF_Font* font = text->Font ? text->Font : m_Font;
 			if (!font) continue;
 
-			SDL_Surface* surface = TTF_RenderText_Blended(font, text->Text.c_str(), 0, text->Color);
+			SDL_Surface* surface = TTF_RenderText_Blended(font, text->Text.c_str(), text->Text.size(), text->Color);
 			SDL_Texture* texture = SDL_CreateTextureFromSurface(m_Renderer->GetSDLRenderer(), surface);
 			
 			//potential bug??

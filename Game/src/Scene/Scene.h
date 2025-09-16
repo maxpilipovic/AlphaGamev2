@@ -66,6 +66,10 @@ public:
     //UI
     void DrawEnemyPath(Renderer* renderer, std::vector<SDL_FPoint> path);
 
+    //BUTTON & TEXT UI
+    Astra::Entity CreateButton(float x, float y, float width, float height, std::string& text);
+    Astra::Entity CreateText(float x, float y, std::string& text);
+
     // Astra::Entity FindEntity(const std::string& name) const;  
 
     template<typename T, typename... Args>  

@@ -136,6 +136,11 @@ struct UITextComponent
 	TTF_Font* Font = nullptr;
 	SDL_Color Color = { 255, 255, 255, 255 };
 	bool Visible = true;
+
+	void Serialize(auto& ar)
+	{
+		ar(Text);
+	}
 };
 
 //enum class or enum?
