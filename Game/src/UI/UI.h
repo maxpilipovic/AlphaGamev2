@@ -15,10 +15,13 @@ public:
 	void Init();
 	void Update(float dt);
 	void Render();
-	void HandleEvent(SDL_Event& event);
+
+	
 
 private:
 	Scene* m_Scene;
 	Renderer* m_Renderer;
-	TTF_Font* m_Font;
+	std::map<int, TTF_Font*> m_Fonts;
+
+	TTF_Font* GetFont(int size);
 };

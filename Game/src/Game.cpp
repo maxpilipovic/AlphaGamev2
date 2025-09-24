@@ -5,6 +5,7 @@
 #include "Core/InputManager.h"
 #include "Scene/Scene.h"
 #include "UI/UI.h"
+#include "Scene/Player.h"
 
 //Constructor
 
@@ -71,7 +72,6 @@ void Game::Run()
 				m_isRunning = false;
 			}
 			m_inputManager->ProcessEvent(event);
-			m_UI->HandleEvent(event);
 		}
 
 		Uint64 currentTime = SDL_GetPerformanceCounter();

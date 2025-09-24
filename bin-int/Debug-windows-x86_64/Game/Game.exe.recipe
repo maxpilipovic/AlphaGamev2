@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\dev\AlphaGame\bin\Debug-windows-x86_64\Game\Game.exe</FullPath>
+      <FullPath>C:\dev\AlphaGamev2\bin\Debug-windows-x86_64\Game\Game.exe</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

@@ -164,22 +164,24 @@
   <ItemGroup>
     <ClInclude Include="src\Core\InputManager.h" />
     <ClInclude Include="src\Core\Math.h" />
+    <ClInclude Include="src\Core\PathUtils.h" />
     <ClInclude Include="src\Core\Paths.h" />
     <ClInclude Include="src\Core\Window.h" />
-    <ClInclude Include="src\Core\PathUtils.h" />
     <ClInclude Include="src\Game.h" />
     <ClInclude Include="src\Renderer\Renderer.h" />
     <ClInclude Include="src\Scene\Components.h" />
+    <ClInclude Include="src\Scene\Player.h" />
     <ClInclude Include="src\Scene\Scene.h" />
     <ClInclude Include="src\UI\UI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\InputManager.cpp" />
+    <ClCompile Include="src\Core\PathUtils.cpp" />
     <ClCompile Include="src\Core\Paths.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
-    <ClCompile Include="src\Core\PathUtils.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Scene\Player.cpp" />
     <ClCompile Include="src\Scene\Scene.cpp" />
     <ClCompile Include="src\UI\UI.cpp" />
     <ClCompile Include="src\main.cpp" />

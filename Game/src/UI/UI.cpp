@@ -2,15 +2,15 @@
 #include "../Core/PathUtils.h"
 #include <iostream>
 
-UI::UI(Scene* scene, Renderer* renderer) : m_Scene(scene), m_Renderer(renderer), m_Font(nullptr)
+UI::UI(Scene* scene, Renderer* renderer) : m_Scene(scene), m_Renderer(renderer)
 {
 }
 
 UI::~UI()
 {
-	if (m_Font)
+	for (auto const& [size, font] : m_Fonts)
 	{
-		TTF_CloseFont(m_Font);
+		TTF_CloseFont(font);
 	}
 }
 
@@ -23,13 +23,6 @@ void UI::Init()
 	if (TTF_Init() == -1) {
 		std::cerr << "Failed to initialize SDL_ttf: " << std::endl;
 		return;
-	}
-
-	std::string fontPath = PathUtils::GetAssetsPath() + "Open_Sans/OpenSans-VariableFont_wdth,wght.ttf";
-	m_Font = TTF_OpenFont(fontPath.c_str(), 10);
-	if (!m_Font)
-	{
-		std::cerr << "Failed to load font: "  << SDL_GetError() << std::endl;
 	}
 }
 
@@ -120,7 +113,7 @@ void UI::Render()
 
 		if (text->Visible && !text->Text.empty())
 		{
-			TTF_Font* font = text->Font ? text->Font : m_Font;
+			TTF_Font* font = GetFont(text->FontSize);
 			if (!font) continue;
 
 			SDL_Surface* surface = TTF_RenderText_Blended(font, text->Text.c_str(), text->Text.size(), text->Color);
@@ -136,7 +129,21 @@ void UI::Render()
 	}
 }
 
-void UI::HandleEvent(SDL_Event& event)
+TTF_Font* UI::GetFont(int size)
 {
-	// Handle events if needed
+	if (m_Fonts.find(size) != m_Fonts.end())
+	{
+		return m_Fonts[size];
+	}
+
+	std::string fontPath = PathUtils::GetAssetsPath() + "Open_Sans/OpenSans-VariableFont_wdth,wght.ttf";
+	TTF_Font* font = TTF_OpenFont(fontPath.c_str(), size);
+	if (!font)
+	{
+		std::cerr << "Failed to load font: " << SDL_GetError() << std::endl;
+		return nullptr;
+	}
+
+	m_Fonts[size] = font;
+	return font;
 }

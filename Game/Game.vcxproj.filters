@@ -21,6 +21,9 @@
     <ClInclude Include="src\Core\Math.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="src\Core\PathUtils.h">
+      <Filter>Core</Filter>
+    </ClInclude>
     <ClInclude Include="src\Core\Paths.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -34,6 +37,9 @@
     <ClInclude Include="src\Scene\Components.h">
       <Filter>Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Scene\Player.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
     <ClInclude Include="src\Scene\Scene.h">
       <Filter>Scene</Filter>
     </ClInclude>
@@ -45,6 +51,9 @@
     <ClCompile Include="src\Core\InputManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Core\PathUtils.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
     <ClCompile Include="src\Core\Paths.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -54,6 +63,9 @@
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\Renderer\Renderer.cpp">
       <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Scene\Player.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Scene\Scene.cpp">
       <Filter>Scene</Filter>

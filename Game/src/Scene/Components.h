@@ -135,6 +135,7 @@ struct UITextComponent
 	std::string Text;
 	TTF_Font* Font = nullptr;
 	SDL_Color Color = { 255, 255, 255, 255 };
+	int FontSize = 24;
 	bool Visible = true;
 
 	void Serialize(auto& ar)

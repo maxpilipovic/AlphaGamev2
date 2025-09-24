@@ -3,6 +3,7 @@
 #include "../Renderer/Renderer.h"  
 #include "Components.h"  
 #include "../Core/Paths.h" 
+#include "Player.h"
 
 class InputManager;  
 
@@ -69,6 +70,7 @@ public:
     //BUTTON & TEXT UI
     Astra::Entity CreateButton(float x, float y, float width, float height, std::string& text);
     Astra::Entity CreateText(float x, float y, std::string& text);
+    void AddTextToScreen(float x, float y, Astra::Entity textEntity, std::string text, int fontSize);
 
     // Astra::Entity FindEntity(const std::string& name) const;  
 
@@ -93,6 +95,7 @@ public:
 private:  
     void UpdatePhysics(float deltaTime);  
 
+    Player m_player;
     Astra::Registry m_registry;  
     bool m_active = false;  
     std::vector<Astra::Entity> m_entities;  
@@ -103,6 +106,10 @@ private:
     //Spawning Tanks  
     float m_tankSpawnTimer = 0.0f;  
     float m_tankSpawnInterval = 5.0f;  
+
+    //UI
+    Astra::Entity m_cashText;
+    Astra::Entity m_levelText;
 
     //Create path entity
     Astra::Entity m_pathZone;

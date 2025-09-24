@@ -4,6 +4,7 @@
 #include "../Core/InputManager.h"
 #include <SDL3/SDL.h>
 #include <core/Math.h>
+#include <string> 
 
 void Scene::Initialize(std::shared_ptr<InputManager> inputManager)
 {
@@ -25,11 +26,9 @@ void Scene::Initialize(std::shared_ptr<InputManager> inputManager)
 
     std::string buttonText4 = "Yellow Tank! $600";
     CreateButton(1150, 190, 100, 50, buttonText4);
-
-    //Text
-    std::string displayHealth = "Health : ";
-    CreateText(500, 100, displayHealth);
     
+    m_cashText = CreateEntity<UITransformComponent, UITextComponent>();
+    m_levelText = CreateEntity<UITransformComponent, UITextComponent>();
 }
 
 void Scene::Shutdown()
@@ -51,6 +50,10 @@ void Scene::Update(float deltatime)
     bool checkKey6 = m_inputManager->IsKeyPressed(SDLK_6);
     bool checkKey7 = m_inputManager->IsKeyPressed(SDLK_7);
     bool checkKey8 = m_inputManager->IsKeyPressed(SDLK_8);
+
+    //UI TEXT
+    AddTextToScreen(50, 100, m_cashText, std::to_string(m_player.getCash()), 32);
+    AddTextToScreen(50, 130, m_levelText, std::to_string(m_player.getLevel()), 24);
 
     if (!m_placingEntity) {
         if (checkKey1)
@@ -854,11 +857,23 @@ Astra::Entity Scene::CreateText(float x, float y, std::string& string)
     auto transformPointer = GetComponent<UITransformComponent>(textEntity);
     auto textPointer = GetComponent<UITextComponent>(textEntity);
 
-    transformPointer->Size.x = x;
-    transformPointer->Size.y = y;
+    transformPointer->Position.x = x;
+    transformPointer->Position.y = y;
 
     textPointer->Text = string;
 
 
     return textEntity;
+}
+
+void Scene::AddTextToScreen(float x, float y, Astra::Entity textEntity, std::string text, int fontSize)
+{
+    auto transformPointer = GetComponent<UITransformComponent>(textEntity);
+    auto textPointer = GetComponent<UITextComponent>(textEntity);
+
+    transformPointer->Position.x = x;
+    transformPointer->Position.y = y;
+
+    textPointer->Text = text;
+    textPointer->FontSize = fontSize;
 }
