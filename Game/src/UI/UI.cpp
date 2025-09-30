@@ -43,14 +43,7 @@ void UI::Update(float dt)
 
 		if (SDL_PointInRectFloat(&mousePoint, &buttonRect))
 		{
-			if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON_MASK(SDL_BUTTON_LEFT))
-			{
-				button->State = ButtonState::Pressed;
-			}
-			else
-			{
-				button->State = ButtonState::Hovered;
-			}
+			button->State = ButtonState::Hovered;
 		}
 		else
 		{
@@ -146,4 +139,33 @@ TTF_Font* UI::GetFont(int size)
 
 	m_Fonts[size] = font;
 	return font;
+}
+
+// This function handles discrete events, such as mouse clicks.
+void UI::HandleEvent(const SDL_Event& e)
+{
+
+	//Checks if mouse event button down and left click
+	if (e.type == SDL_EVENT_MOUSE_BUTTON_DOWN && e.button.button == SDL_BUTTON_LEFT)
+	{
+		//1. Mouse state x and y.
+		float mouseX = (float)e.button.x;
+		float mouseY = (float)e.button.y;
+
+		auto view = m_Scene->GetRegistry().CreateView<UIButtonComponent, UITransformComponent>();
+		for (auto [entity, button, transform] : view)
+		{
+
+			if (!button->Visible) continue; //False
+
+			SDL_FRect buttonRect = { transform->Position.x, transform->Position.y, transform->Size.x, transform->Size.y };
+			SDL_FPoint mousePoint = { mouseX, mouseY };
+
+			if (SDL_PointInRectFloat(&mousePoint, &buttonRect))
+			{
+				std::cout << "Clicked button" << std::endl;
+				m_Scene->CreateRobot(RobotType::Blue);
+			}
+		}
+	}
 }

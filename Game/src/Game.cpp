@@ -72,6 +72,9 @@ void Game::Run()
 				m_isRunning = false;
 			}
 			m_inputManager->ProcessEvent(event);
+
+			//Forward event to UI
+			m_UI->HandleEvent(event);
 		}
 
 		Uint64 currentTime = SDL_GetPerformanceCounter();
@@ -100,7 +103,7 @@ void Game::Update(float deltaTime)
 	}
 
     m_scene->Update(deltaTime);
-	 m_UI->Update(deltaTime);
+	m_UI->Update(deltaTime);
 }
 
 void Game::Render()

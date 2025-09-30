@@ -52,8 +52,8 @@ void Scene::Update(float deltatime)
     bool checkKey8 = m_inputManager->IsKeyPressed(SDLK_8);
 
     //UI TEXT
-    AddTextToScreen(50, 100, m_cashText, std::to_string(m_player.getCash()), 32);
-    AddTextToScreen(50, 130, m_levelText, std::to_string(m_player.getLevel()), 24);
+    AddTextToScreen(550, 10, m_cashText, ("Cash: " + std::to_string(m_player.getCash())), 24);
+    AddTextToScreen(700, 10, m_levelText, ("Level: " + std::to_string(m_player.getLevel())), 24);
 
     if (!m_placingEntity) {
         if (checkKey1)
@@ -341,7 +341,7 @@ bool Scene::IsPlacingEntityColliding()
 
 void Scene::FinalizePlacingEntity()
 {
-    if (!m_placingEntity || !m_inputManager->IsButtonPressed(SDL_BUTTON_LEFT))
+    if (!m_placingEntity || !m_inputManager->IsButtonPressed(SDL_BUTTON_RIGHT))
         return;
 
     auto transform = GetComponent<Transform>(m_currentPlacingEntity);
@@ -813,6 +813,8 @@ void Scene::UpdateProjectiles(float deltaTime)
 
                 if (tank->health <= 0)
                 {
+                    int newCash = m_player.getCash() + 100;
+                    m_player.setCash(newCash);
                     entitiesToDestroy.push_back(tankEntity);
                 }
                 break;
@@ -847,6 +849,7 @@ Astra::Entity Scene::CreateButton(float x, float y, float width, float height, s
 
     textPointer->Text = string;
     textPointer->Color = { 255, 255, 255, 255 }; //white
+    textPointer->FontSize = 12;
 
     return buttonEntity;
 }
@@ -876,4 +879,5 @@ void Scene::AddTextToScreen(float x, float y, Astra::Entity textEntity, std::str
 
     textPointer->Text = text;
     textPointer->FontSize = fontSize;
+
 }

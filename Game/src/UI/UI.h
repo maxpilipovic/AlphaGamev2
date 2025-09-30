@@ -15,6 +15,8 @@ public:
 	void Init();
 	void Update(float dt);
 	void Render();
+	void HandleEvent(const SDL_Event& e);
+
 
 	
 
