@@ -29,6 +29,8 @@ void Scene::Initialize(std::shared_ptr<InputManager> inputManager)
     
     m_cashText = CreateEntity<UITransformComponent, UITextComponent>();
     m_levelText = CreateEntity<UITransformComponent, UITextComponent>();
+
+    LoadLevel1();
 }
 
 void Scene::Shutdown()
@@ -95,7 +97,7 @@ void Scene::Update(float deltatime)
     
     if (m_tankSpawnTimer >= m_tankSpawnInterval)
     {
-        SpawnEnemyTank();
+        //SpawnEnemyTank(); //UNCOMMENT THIS FOR REOCCURING TANK SPAWNING
         m_tankSpawnTimer = 0.0f;
     }
 
@@ -125,6 +127,9 @@ void Scene::Update(float deltatime)
 
     //Update physics (idk if I have any for this project)
     UpdatePhysics(deltatime);
+
+    //LEVELS
+    UpdateLevel(deltatime);
 }
 
 bool Scene::UpdatePathZone()
@@ -233,10 +238,10 @@ void Scene::UpdateTankPathing(float deltatime)
     }
 }
 
-void Scene::SpawnEnemyTank()
+void Scene::SpawnEnemyTank(TankType tank)
 {
     // Create entity with all components atomically
-    Astra::Entity spawnedTank = CreateEntity<Tank, OrangeTank, PathFollower, SpriteRendererComponent, CircleCollider>();
+    Astra::Entity spawnedTank = CreateEntity<Tank, PathFollower, SpriteRendererComponent, CircleCollider>();
     
     // Get component pointers after all components are added
     auto transform = GetComponent<Transform>(spawnedTank);
@@ -249,10 +254,40 @@ void Scene::SpawnEnemyTank()
 
     circle->radius = 40.0f;
 
-    //Orange tank
-    sprite->red = 255;
-    sprite->green = 165;
-    sprite->blue = 0;
+    switch (tank)
+    {
+        case TankType::Teal:
+            sprite->red = 0;
+            sprite->green = 128;
+            sprite->blue = 128;
+            GetComponent<Tank>(spawnedTank)->health = 5.0f;
+            pathfinder->speed = 90.0f;
+            break;
+
+        case TankType::Orange:
+            sprite->red = 255;
+            sprite->green = 165;
+            sprite->blue = 0;
+            GetComponent<Tank>(spawnedTank)->health = 8.0f;
+            pathfinder->speed = 80.0f;
+            break;
+
+        case TankType::Violet:
+            sprite->red = 148;
+            sprite->green = 0;
+            sprite->blue = 211;
+            GetComponent<Tank>(spawnedTank)->health = 10.0f;
+            pathfinder->speed = 70.0f;
+            break;
+
+        case TankType::Red:
+            sprite->red = 255;
+            sprite->green = 0;
+            sprite->blue = 0;
+            GetComponent<Tank>(spawnedTank)->health = 12.0f;
+            pathfinder->speed = 60.0f;
+            break;
+    }
 
     //Set initial position
     transform->width = 50.0f;
@@ -902,3 +937,81 @@ Player& Scene::GetPlayer()
 {
     return m_player;
 }
+
+void Scene::LoadLevel1()
+{
+
+    m_currentLevel.waves =
+    {
+        //Type of robot, count, spawnfreq
+        { {TankType::Teal, 5, 1.0f} },
+
+        { {TankType::Orange, 3, 0.7f}, {TankType::Violet, 2, 0.5f} },
+
+        { {TankType::Teal, 5, 0.6f}, {TankType::Red, 5, 0.6f} }
+    };
+
+    m_currentWaveIndex = 0;
+    m_currentSpawnIndex = 0;
+    m_enemiesLeftInSpawn = 0;
+    m_spawnTimer = 0.0f;
+    m_isLevelActive = true;
+}
+
+void Scene::UpdateLevel(float delatime)
+{
+    //No active level or finished it
+    if (!m_isLevelActive || m_currentWaveIndex >= m_currentLevel.waves.size())
+    {
+        return;
+    }
+
+    auto& wave = m_currentLevel.waves[m_currentWaveIndex];
+    auto& spawn = wave[m_currentSpawnIndex];
+
+    //Add deltatime
+    m_spawnTimer += delatime;
+
+    //Spawn this group...
+    if (m_enemiesLeftInSpawn <= 0)
+    {
+        m_enemiesLeftInSpawn = spawn.count;
+        m_spawnTimer = 0.0f;
+    }
+
+    //Time to spawn next enemy
+    if (m_spawnTimer >= spawn.spawnInterval && m_enemiesLeftInSpawn > 0)
+    {
+        SpawnEnemyTank(spawn.type);
+        m_enemiesLeftInSpawn--;
+        m_spawnTimer = 0.0f;
+    }
+
+    //FInished with this level?
+    if (m_enemiesLeftInSpawn <= 0)
+    {
+        if (m_currentSpawnIndex < wave.size() - 1)
+        {
+            m_currentSpawnIndex++;
+        }
+        else
+        {
+            //Finished this wave
+            m_currentSpawnIndex = 0;
+            m_currentWaveIndex++;
+
+            //Check if we've completed all waves
+            if (m_currentWaveIndex >= m_currentLevel.waves.size())
+            {
+                m_isLevelActive = false;
+                std::cout << "Level Complete" << std::endl;
+            }
+            else
+            {
+                std::cout << "Starting new wave" << std::endl;
+            }
+        }
+
+    }
+
+};

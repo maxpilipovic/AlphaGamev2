@@ -21,6 +21,19 @@ enum class TankType {
     Red  
 };  
 
+struct EnemySpawn
+{
+    TankType type;
+    int count;
+    float spawnInterval;
+
+};
+
+struct Level
+{
+    std::vector<std::vector<EnemySpawn>> waves;
+};
+
 class Scene  
 {  
 public:  
@@ -58,7 +71,7 @@ public:
     void RobotInteraction(float deltatime);  
 
     // Tanks Spawning  
-    void SpawnEnemyTank();  
+    void SpawnEnemyTank(TankType tank);  
     void UpdateTankPathing(float deltatime);
 
     //PathZone Entity
@@ -77,6 +90,7 @@ public:
     //Random reference garbage
     Player& GetPlayer();
 
+    //Templates
     template<typename T, typename... Args>  
     T* AddComponent(Astra::Entity entity, Args&&... args)  
     {  
@@ -88,6 +102,11 @@ public:
     {  
         return m_registry.GetComponent<T>(entity);  
     }  
+
+    //LEVELS
+    void LoadLevel1();
+
+    void UpdateLevel(float delatime);
 
     // Registry access  
     Astra::Registry& GetRegistry() { return m_registry; }  
@@ -120,4 +139,12 @@ private:
     //Draw width of path
     bool m_drawPath = true; //Toggle for visualisation
     float m_widthPath = 80.0f;
+
+    //LEVEL SYSTEM
+    Level m_currentLevel;
+    int m_currentWaveIndex;
+    int m_currentSpawnIndex;
+    int m_enemiesLeftInSpawn;
+    float m_spawnTimer;
+    bool m_isLevelActive = false;
 };

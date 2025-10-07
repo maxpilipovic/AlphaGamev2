@@ -161,19 +161,6 @@ enum class UIButtonAction
 	CreateRobotYellow
 };
 
-struct EnemySpawn
-{
-	RobotType type;
-	int count;
-	float spawnInterval;
-
-};
-
-struct Level
-{
-	std::vector<std::vector<EnemySpawn>> waves;
-};
-
 //Make button interactive. Different colors?
 struct UIButtonComponent
 {
