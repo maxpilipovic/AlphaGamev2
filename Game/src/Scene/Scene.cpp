@@ -16,16 +16,16 @@ void Scene::Initialize(std::shared_ptr<InputManager> inputManager)
 
     //Buttons
     std::string buttonText = "Blue Tank! $150";
-    CreateButton(1150, 25, 100, 50, buttonText);
+    CreateButton(1150, 25, 100, 50, buttonText, 1);
 
     std::string buttonText2 = "Green Tank! $300";
-    CreateButton(1150, 80, 100, 50, buttonText2);
+    CreateButton(1150, 80, 100, 50, buttonText2, 2);
 
     std::string buttonText3 = "Red Tank! $450";
-    CreateButton(1150, 135, 100, 50, buttonText3);
+    CreateButton(1150, 135, 100, 50, buttonText3, 3);
 
     std::string buttonText4 = "Yellow Tank! $600";
-    CreateButton(1150, 190, 100, 50, buttonText4);
+    CreateButton(1150, 190, 100, 50, buttonText4, 4);
     
     m_cashText = CreateEntity<UITransformComponent, UITextComponent>();
     m_levelText = CreateEntity<UITransformComponent, UITextComponent>();
@@ -833,12 +833,12 @@ void Scene::UpdateProjectiles(float deltaTime)
 
 //UI STUFF
 //BUTTON ENTITY CREATION FACTORY
-Astra::Entity Scene::CreateButton(float x, float y, float width, float height, std::string& string)
+Astra::Entity Scene::CreateButton(float x, float y, float width, float height, std::string& string, int color)
 {
     Astra::Entity buttonEntity = CreateEntity<UITransformComponent, UITextComponent, UIButtonComponent>();
     auto transformPointer = GetComponent<UITransformComponent>(buttonEntity);
     auto textPointer = GetComponent<UITextComponent>(buttonEntity);
-
+    auto button = GetComponent<UIButtonComponent>(buttonEntity);
     //Might not need this
     //auto buttonPointer = GetComponent<ButtonState>(buttonEntity);
 
@@ -850,6 +850,22 @@ Astra::Entity Scene::CreateButton(float x, float y, float width, float height, s
     textPointer->Text = string;
     textPointer->Color = { 255, 255, 255, 255 }; //white
     textPointer->FontSize = 12;
+       
+    switch (color)
+    {
+    case 1:
+        button->Action = UIButtonAction::CreateRobotBlue;
+        break;
+    case 2:
+        button->Action = UIButtonAction::CreateRobotGreen;
+        break;
+    case 3:
+        button->Action = UIButtonAction::CreateRobotRed;
+        break;
+    case 4:
+        button->Action = UIButtonAction::CreateRobotYellow;
+        break;
+    }
 
     return buttonEntity;
 }
@@ -880,4 +896,9 @@ void Scene::AddTextToScreen(float x, float y, Astra::Entity textEntity, std::str
     textPointer->Text = text;
     textPointer->FontSize = fontSize;
 
+}
+
+Player& Scene::GetPlayer()
+{
+    return m_player;
 }

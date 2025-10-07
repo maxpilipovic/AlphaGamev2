@@ -152,11 +152,34 @@ enum class ButtonState
 	Pressed
 };
 
+enum class UIButtonAction
+{
+	None,
+	CreateRobotRed,
+	CreateRobotBlue,
+	CreateRobotGreen,
+	CreateRobotYellow
+};
+
+struct EnemySpawn
+{
+	RobotType type;
+	int count;
+	float spawnInterval;
+
+};
+
+struct Level
+{
+	std::vector<std::vector<EnemySpawn>> waves;
+};
+
 //Make button interactive. Different colors?
 struct UIButtonComponent
 {
 	ButtonState State = ButtonState::Normal;
 	bool Visible = true;
+	UIButtonAction Action = UIButtonAction::None;
 
 	// std::function<void()> OnClick;
 	// std::function<void()> OnHover;

@@ -32,6 +32,7 @@ private:
     std::unique_ptr<Scene> m_scene;
     std::unique_ptr<UI> m_UI;
     //std::unique_ptr<Player> m_player;
+    //std::unique_ptr<Player> m_player;
     bool m_isRunning;
 
     uint64_t m_lastFrameTime;

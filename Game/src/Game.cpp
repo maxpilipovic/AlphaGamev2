@@ -42,7 +42,7 @@ bool Game::Initialize(const std::string& title, int width, int height)
 	}
 
 	m_scene->Initialize(m_inputManager);
-	m_UI = std::make_unique<UI>(m_scene.get(), m_renderer.get());
+	m_UI = std::make_unique<UI>(m_scene.get(), m_renderer.get(), &m_scene->GetPlayer());
 	m_UI->Init();
 	
 	/*Astra::Entity player = m_scene->CreateEntity();

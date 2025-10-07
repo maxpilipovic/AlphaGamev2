@@ -68,11 +68,14 @@ public:
     void DrawEnemyPath(Renderer* renderer, std::vector<SDL_FPoint> path);
 
     //BUTTON & TEXT UI
-    Astra::Entity CreateButton(float x, float y, float width, float height, std::string& text);
+    Astra::Entity CreateButton(float x, float y, float width, float height, std::string& text, int color);
     Astra::Entity CreateText(float x, float y, std::string& text);
     void AddTextToScreen(float x, float y, Astra::Entity textEntity, std::string text, int fontSize);
 
     // Astra::Entity FindEntity(const std::string& name) const;  
+
+    //Random reference garbage
+    Player& GetPlayer();
 
     template<typename T, typename... Args>  
     T* AddComponent(Astra::Entity entity, Args&&... args)  

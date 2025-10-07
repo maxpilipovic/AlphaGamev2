@@ -9,7 +9,7 @@
 class UI
 {
 public:
-	UI(Scene* scene, Renderer* renderer);
+	UI(Scene* scene, Renderer* renderer, Player* player);
 	~UI();
 
 	void Init();
@@ -21,6 +21,7 @@ public:
 	
 
 private:
+	Player* m_Player;
 	Scene* m_Scene;
 	Renderer* m_Renderer;
 	std::map<int, TTF_Font*> m_Fonts;

@@ -2,7 +2,7 @@
 #include "../Core/PathUtils.h"
 #include <iostream>
 
-UI::UI(Scene* scene, Renderer* renderer) : m_Scene(scene), m_Renderer(renderer)
+UI::UI(Scene* scene, Renderer* renderer, Player* player) : m_Scene(scene), m_Renderer(renderer), m_Player(player)
 {
 }
 
@@ -163,8 +163,25 @@ void UI::HandleEvent(const SDL_Event& e)
 
 			if (SDL_PointInRectFloat(&mousePoint, &buttonRect))
 			{
-				std::cout << "Clicked button" << std::endl;
-				m_Scene->CreateRobot(RobotType::Blue);
+				switch (button->Action)
+				{
+					case UIButtonAction::CreateRobotBlue:
+						if (m_Player->getCash() >= 100)
+						{
+							m_Player->setCash(m_Player->getCash() - 100);
+							m_Scene->CreateRobot(RobotType::Blue);
+						}
+						break;
+					case UIButtonAction::CreateRobotRed:
+						m_Scene->CreateRobot(RobotType::Red);
+						break;
+					case UIButtonAction::CreateRobotYellow:
+						m_Scene->CreateRobot(RobotType::Yellow);
+						break;
+					case UIButtonAction::CreateRobotGreen:
+						m_Scene->CreateRobot(RobotType::Green);
+						break;
+				}
 			}
 		}
 	}
