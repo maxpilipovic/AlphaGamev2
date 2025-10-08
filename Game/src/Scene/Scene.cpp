@@ -945,20 +945,117 @@ void Scene::LoadLevel1()
     {
         //Type of robot, count, spawnfreq
         { {TankType::Teal, 5, 1.0f} },
-
         { {TankType::Orange, 3, 0.7f}, {TankType::Violet, 2, 0.5f} },
-
-        { {TankType::Teal, 5, 0.6f}, {TankType::Red, 5, 0.6f} }
+        { {TankType::Teal, 5, 0.6f}, {TankType::Red, 5, 0.6f} },
+        { {TankType::Violet, 4, 0.5f}, {TankType::Orange, 4, 0.5f} },
+        { {TankType::Red, 8, 0.4f}, {TankType::Teal, 6, 0.4f} }
     };
 
     m_currentWaveIndex = 0;
     m_currentSpawnIndex = 0;
     m_enemiesLeftInSpawn = 0;
     m_spawnTimer = 0.0f;
+    m_Intermission = 0.0f;
     m_isLevelActive = true;
+    m_isIntermission = false;
+
+    std::cout << "Loaded Level 1" << std::endl;
 }
 
-void Scene::UpdateLevel(float delatime)
+void Scene::LoadLevel2()
+{
+    m_currentLevel.waves =
+    {
+        //Type of robot, count, spawnfreq
+        { {TankType::Orange, 6, 0.8f} },
+        { {TankType::Teal, 4, 0.6f}, {TankType::Violet, 4, 0.6f} },
+        { {TankType::Red, 7, 0.5f}, {TankType::Orange, 3, 0.5f} },
+        { {TankType::Violet, 6, 0.4f}, {TankType::Teal, 6, 0.4f} },
+        { {TankType::Orange, 5, 0.4f}, {TankType::Red, 5, 0.4f}, {TankType::Violet, 3, 0.3f} },
+        { {TankType::Teal, 10, 0.35f}, {TankType::Red, 8, 0.35f} }
+    };
+    m_currentWaveIndex = 0;
+    m_currentSpawnIndex = 0;
+    m_enemiesLeftInSpawn = 0;
+    m_spawnTimer = 0.0f;
+    m_Intermission = 0.0f;
+    m_isLevelActive = true;
+    m_isIntermission = false;
+
+    std::cout << "Loaded Level 2" << std::endl;
+}
+
+void Scene::LoadLevel3()
+{
+    m_currentLevel.waves =
+    {
+        //Type of robot, count, spawnfreq
+        { {TankType::Violet, 7, 0.7f} },
+        { {TankType::Red, 5, 0.5f}, {TankType::Orange, 5, 0.5f} },
+        { {TankType::Teal, 8, 0.4f}, {TankType::Violet, 5, 0.4f} },
+        { {TankType::Orange, 6, 0.35f}, {TankType::Red, 6, 0.35f}, {TankType::Teal, 4, 0.35f} },
+        { {TankType::Violet, 8, 0.3f}, {TankType::Orange, 8, 0.3f} },
+        { {TankType::Red, 12, 0.3f}, {TankType::Teal, 10, 0.3f}, {TankType::Violet, 6, 0.25f} }
+    };
+    m_currentWaveIndex = 0;
+    m_currentSpawnIndex = 0;
+    m_enemiesLeftInSpawn = 0;
+    m_spawnTimer = 0.0f;
+    m_Intermission = 0.0f;
+    m_isLevelActive = true;
+    m_isIntermission = false;
+
+    std::cout << "Loaded Level 3" << std::endl;
+}
+
+void Scene::LoadLevel4()
+{
+    m_currentLevel.waves =
+    {
+        //Type of robot, count, spawnfreq
+        { {TankType::Red, 8, 0.6f} },
+        { {TankType::Violet, 6, 0.5f}, {TankType::Teal, 6, 0.5f} },
+        { {TankType::Orange, 8, 0.4f}, {TankType::Red, 6, 0.4f} },
+        { {TankType::Teal, 10, 0.35f}, {TankType::Violet, 8, 0.3f}, {TankType::Orange, 5, 0.3f} },
+        { {TankType::Red, 10, 0.3f}, {TankType::Teal, 10, 0.3f}, {TankType::Violet, 8, 0.25f} },
+        { {TankType::Orange, 12, 0.25f}, {TankType::Red, 12, 0.25f}, {TankType::Teal, 10, 0.25f} }
+    };
+    m_currentWaveIndex = 0;
+    m_currentSpawnIndex = 0;
+    m_enemiesLeftInSpawn = 0;
+    m_spawnTimer = 0.0f;
+    m_Intermission = 0.0f;
+    m_isLevelActive = true;
+    m_isIntermission = false;
+    std::cout << "Loaded Level 4" << std::endl;
+
+    std::cout << "Loaded Level 4" << std::endl;
+}
+
+void Scene::LoadLevel5()
+{
+    m_currentLevel.waves =
+    {
+        //Type of robot, count, spawnfreq
+        { {TankType::Teal, 10, 0.5f}, {TankType::Orange, 5, 0.5f} },
+        { {TankType::Red, 8, 0.4f}, {TankType::Violet, 8, 0.4f} },
+        { {TankType::Orange, 10, 0.35f}, {TankType::Teal, 10, 0.35f}, {TankType::Red, 6, 0.3f} },
+        { {TankType::Violet, 12, 0.3f}, {TankType::Orange, 10, 0.3f}, {TankType::Teal, 8, 0.25f} },
+        { {TankType::Red, 15, 0.25f}, {TankType::Violet, 12, 0.25f}, {TankType::Orange, 10, 0.2f} },
+        { {TankType::Teal, 15, 0.2f}, {TankType::Red, 15, 0.2f}, {TankType::Violet, 12, 0.2f}, {TankType::Orange, 10, 0.2f} }
+    };
+    m_currentWaveIndex = 0;
+    m_currentSpawnIndex = 0;
+    m_enemiesLeftInSpawn = 0;
+    m_spawnTimer = 0.0f;
+    m_Intermission = 0.0f;
+    m_isLevelActive = true;
+    m_isIntermission = false;
+
+    std::cout << "Loaded Level 5" << std::endl;
+}
+
+void Scene::UpdateLevel(float deltatime)
 {
     //No active level or finished it
     if (!m_isLevelActive || m_currentWaveIndex >= m_currentLevel.waves.size())
@@ -966,13 +1063,32 @@ void Scene::UpdateLevel(float delatime)
         return;
     }
 
+    //INTERMISSION CODE
+    if (m_isIntermission)
+    {
+        //In a intermission..
+        m_Intermission += deltatime;
+
+        if (m_Intermission >= 15.0f)
+        {
+            m_isIntermission = false;
+            m_Intermission = 0;
+            std::cout << "WAVE STARTING!" << std::endl;
+            
+        }
+        else
+        {
+            return;
+        }
+    }
+
     auto& wave = m_currentLevel.waves[m_currentWaveIndex];
     auto& spawn = wave[m_currentSpawnIndex];
 
     //Add deltatime
-    m_spawnTimer += delatime;
+    m_spawnTimer += deltatime;
 
-    //Spawn this group...
+    //Spawn this group... //Resets
     if (m_enemiesLeftInSpawn <= 0)
     {
         m_enemiesLeftInSpawn = spawn.count;
@@ -1005,13 +1121,52 @@ void Scene::UpdateLevel(float delatime)
             {
                 m_isLevelActive = false;
                 std::cout << "Level Complete" << std::endl;
+
+                //LOAD NEXT LEVEL
+                LoadNextLevel();
             }
             else
             {
-                std::cout << "Starting new wave" << std::endl;
+                m_isIntermission = true;
+                std::cout << "INTERMISSION 15 Seconds" << std::endl;
             }
         }
 
     }
 
-};
+}
+
+void Scene::LoadNextLevel()
+{
+
+    //Increment level count..
+    m_levelCount++;
+
+    switch (m_levelCount)
+    {
+        case 1:
+            LoadLevel1();
+            std::cout << "Loaded Level 1" << std::endl;
+            break;
+        case 2:
+            LoadLevel2();
+            std::cout << "Loaded Level 2" << std::endl;
+            break;
+        case 3:
+            LoadLevel3();
+            std::cout << "Loaded Level 3" << std::endl;
+            break;
+        case 4:
+            LoadLevel4();
+            std::cout << "Loaded Level 4" << std::endl;
+            break;
+        case 5:
+            LoadLevel5();
+            std::cout << "Loaded Level 5" << std::endl;
+            break;
+        default:
+            std::cout << "All levels complete! Game over" << std::endl;
+            m_isLevelActive = false;
+            break;
+    }
+}

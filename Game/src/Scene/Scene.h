@@ -105,7 +105,12 @@ public:
 
     //LEVELS
     void LoadLevel1();
+    void LoadLevel2();
+    void LoadLevel3();
+    void LoadLevel4();
+    void LoadLevel5();
 
+    void LoadNextLevel();
     void UpdateLevel(float delatime);
 
     // Registry access  
@@ -142,9 +147,14 @@ private:
 
     //LEVEL SYSTEM
     Level m_currentLevel;
-    int m_currentWaveIndex;
-    int m_currentSpawnIndex;
-    int m_enemiesLeftInSpawn;
-    float m_spawnTimer;
+    int m_currentWaveIndex = 0;
+    int m_currentSpawnIndex = 0;
+    int m_enemiesLeftInSpawn = 0;
+    float m_spawnTimer = 0.0f;
+    float m_Intermission = 0.0f;
     bool m_isLevelActive = false;
+    bool m_isIntermission = false;
+
+    //LEVEL NUMBER
+    int m_levelCount = 1;
 };
